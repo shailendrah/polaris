@@ -36,9 +36,7 @@ public final class Profiles {
           "polaris.features.\"SUPPORTED_CATALOG_STORAGE_TYPES\"",
           "[\"FILE\",\"S3\"]",
           "polaris.event-listener.type",
-          "test",
-          "polaris.readiness.ignore-severe-issues",
-          "true");
+          "test");
     }
   }
 }

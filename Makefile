@@ -27,14 +27,11 @@ DOCKER ?= docker
 MINIKUBE_PROFILE ?= minikube
 DEPENDENCIES ?= ct helm helm-docs java21 git yamllint
 OPTIONAL_DEPENDENCIES := jq kubectl minikube
-VENV_DIR := .venv
 PYTHON_CLIENT_DIR := client/python
-ACTIVATE_AND_CD = source $(VENV_DIR)/bin/activate && cd $(PYTHON_CLIENT_DIR)
 
 ## Version information
 BUILD_VERSION := $(shell cat version.txt)
 GIT_COMMIT := $(shell git rev-parse HEAD)
-UV_VERSION := $(shell cat client/python/pyproject.toml | grep -A1 tool.uv | grep -v tool.uv | grep required-version | sed 's/required-version *= *"\([^"]*\)".*/\1/')
 
 ##@ General
 
@@ -46,7 +43,6 @@ help: ## Display this help
 version: ## Display version information
 	@echo "Build version: ${BUILD_VERSION}"
 	@echo "Git commit: ${GIT_COMMIT}"
-	@echo "UV version: ${UV_VERSION}"
 
 ##@ Polaris Build
 
@@ -105,29 +101,116 @@ spotless-apply: check-dependencies ## Apply code formatting using Spotless Gradl
 	@./gradlew spotlessApply
 	@echo "--- Spotless formatting applied ---"
 
+##@ Oracle Tests
+
+# Oracle connection settings. Override on the command line, e.g.
+#   make test ORACLE_USER=app ORACLE_PASSWORD=secret ORACLE_HOST=db.example.com
+ORACLE_HOST ?= localhost
+ORACLE_PORT ?= 1521
+ORACLE_SERVICE ?= FREEPDB1
+ORACLE_USER ?= skmishra
+ORACLE_PASSWORD ?= skmishra
+ORACLE_JDBC_URL ?= jdbc:oracle:thin:@//$(ORACLE_HOST):$(ORACLE_PORT)/$(ORACLE_SERVICE)
+
+# Resolve ojdbc11 from the Gradle cache (after at least one Gradle build has run).
+OJDBC_JAR = $(shell find $(HOME)/.gradle/caches/modules-2/files-2.1/com.oracle.database.jdbc/ojdbc11 -name 'ojdbc11-*.jar' -not -name '*-sources*' -not -name '*-javadoc*' 2>/dev/null | head -1)
+
+# Env vars injected into Gradle test invocations and the Polaris run target.
+ORACLE_TEST_ENV = \
+	QUARKUS_DATASOURCE_JDBC_URL='$(ORACLE_JDBC_URL)' \
+	QUARKUS_DATASOURCE_USERNAME='$(ORACLE_USER)' \
+	QUARKUS_DATASOURCE_PASSWORD='$(ORACLE_PASSWORD)'
+
+.PHONY: oracle-check
+oracle-check: ## Check Oracle reachability and ojdbc11 availability
+	@echo "--- Checking Oracle reachability at $(ORACLE_HOST):$(ORACLE_PORT) ---"
+	@nc -z -w 3 $(ORACLE_HOST) $(ORACLE_PORT) || (echo "ERROR: Cannot reach $(ORACLE_HOST):$(ORACLE_PORT)" && exit 1)
+	@echo "Port reachable."
+	@if [ -z "$(OJDBC_JAR)" ]; then \
+		echo "WARN: ojdbc11 jar not found in Gradle cache. Run any Gradle task once (e.g. 'make build-server') so the dependency is downloaded."; \
+	else \
+		echo "ojdbc11 jar: $(OJDBC_JAR)"; \
+	fi
+
+.PHONY: oracle-reset
+oracle-reset: ## Drop and recreate POLARIS_SCHEMA on Oracle (DBA priv required)
+	@if [ -z "$(OJDBC_JAR)" ]; then \
+		echo "ERROR: ojdbc11 jar not found in Gradle cache. Run 'make build-server' once to populate it."; \
+		exit 1; \
+	fi
+	@echo "--- Resetting POLARIS_SCHEMA on $(ORACLE_JDBC_URL) ---"
+	@$(ORACLE_TEST_ENV) java -cp "$(OJDBC_JAR)" tools/scripts/PolarisSchemaReset.java
+
+.PHONY: test-unit
+test-unit: ## Run pure unit tests (no Oracle connection needed)
+	@echo "--- Running :polaris-relational-jdbc:test (unit tests) ---"
+	@./gradlew :polaris-relational-jdbc:test
+
+.PHONY: test-admin
+test-admin: ## Run admin tool tests against Oracle (14 tests)
+	@echo "--- Running :polaris-admin:test against $(ORACLE_JDBC_URL) ---"
+	@$(ORACLE_TEST_ENV) ./gradlew :polaris-admin:test
+
+.PHONY: test-integration
+test-integration: ## Run service integration tests against Oracle (309 tests)
+	@echo "--- Running :polaris-runtime-service:intTest against $(ORACLE_JDBC_URL) ---"
+	@$(ORACLE_TEST_ENV) ./gradlew :polaris-runtime-service:intTest
+
+.PHONY: test
+test: test-unit test-admin test-integration ## Run all three test layers
+
+.PHONY: test-rerun
+test-rerun: ## Force-rerun all tests even if Gradle thinks they are up to date
+	@echo "--- Force re-running all test layers against $(ORACLE_JDBC_URL) ---"
+	@$(ORACLE_TEST_ENV) ./gradlew :polaris-relational-jdbc:test :polaris-admin:test :polaris-runtime-service:intTest --rerun-tasks
+
+##@ Run Polaris
+
+# Persistent token-broker RSA key pair (avoids per-restart key regeneration warnings).
+DEV_DIR := .dev
+DEV_KEYS_DIR := $(DEV_DIR)/keys
+DEV_PUBLIC_KEY := $(DEV_KEYS_DIR)/rsa.pub
+DEV_PRIVATE_KEY := $(DEV_KEYS_DIR)/rsa.key
+
+# Log filters that quiet third-party noise we cannot fix in our codebase. Anything ERROR or above
+# from these categories still surfaces; only WARN/INFO get dropped.
+RUN_POLARIS_LOG_ENV = \
+	QUARKUS_LOG_CATEGORY__ORG_HIBERNATE_VALIDATOR__LEVEL=ERROR \
+	QUARKUS_LOG_CATEGORY__IO_MICROMETER_CORE_INSTRUMENT__LEVEL=ERROR
+
+# Token-broker key paths (Polaris config keys) exposed as env vars.
+RUN_POLARIS_KEY_ENV = \
+	POLARIS_AUTHENTICATION_TOKEN_BROKER_RSA_KEY_PAIR_PUBLIC_KEY_FILE=$(CURDIR)/$(DEV_PUBLIC_KEY) \
+	POLARIS_AUTHENTICATION_TOKEN_BROKER_RSA_KEY_PAIR_PRIVATE_KEY_FILE=$(CURDIR)/$(DEV_PRIVATE_KEY)
+
+.PHONY: dev-keys
+dev-keys: $(DEV_PUBLIC_KEY) $(DEV_PRIVATE_KEY) ## Generate persistent RSA key pair for the token broker (one-time)
+
+$(DEV_PRIVATE_KEY):
+	@mkdir -p $(DEV_KEYS_DIR)
+	@echo "--- Generating dev RSA key pair into $(DEV_KEYS_DIR)/ ---"
+	@openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out $(DEV_PRIVATE_KEY) 2>/dev/null
+	@chmod 600 $(DEV_PRIVATE_KEY)
+
+$(DEV_PUBLIC_KEY): $(DEV_PRIVATE_KEY)
+	@openssl rsa -in $(DEV_PRIVATE_KEY) -pubout -out $(DEV_PUBLIC_KEY) 2>/dev/null
+
+.PHONY: run-polaris
+run-polaris: dev-keys ## Start the Polaris server pointing at Oracle (Ctrl+C to stop)
+	@echo "--- Starting Polaris server against $(ORACLE_JDBC_URL) ---"
+	@echo "Bootstrap credentials: POLARIS,root,s3cr3t"
+	@echo "HTTP API on :8181, management on :8182"
+	@echo "Token-broker keys: $(DEV_KEYS_DIR)/ (regenerate with: rm -rf $(DEV_DIR))"
+	@$(ORACLE_TEST_ENV) $(RUN_POLARIS_KEY_ENV) $(RUN_POLARIS_LOG_ENV) ./gradlew :polaris-server:run
+
 ##@ Polaris Client
 
-# Target to create the virtual environment directory
-$(VENV_DIR):
-	@echo "Setting up Python virtual environment at $(VENV_DIR)..."
-	@$(PYTHON) -m venv $(VENV_DIR)
-	@echo "Virtual environment created."
-
-.PHONY: client-install-dependencies
-client-install-dependencies: $(VENV_DIR)
-	@echo "Installing UV and project dependencies into $(VENV_DIR)..."
-	@$(VENV_DIR)/bin/pip install --upgrade pip
-	@if [ ! -f "$(VENV_DIR)/bin/uv" ]; then \
-		$(VENV_DIR)/bin/pip install --upgrade "uv$(UV_VERSION)"; \
-	fi
-	@$(ACTIVATE_AND_CD) && uv lock && uv sync --active --all-extras
-	@echo "uv and dependencies installed."
-
-.PHONY: client-setup-env
-client-setup-env: $(VENV_DIR) client-install-dependencies
+# All client-* targets require an externally managed Python venv with `uv` and the
+# apache-polaris dev deps already installed. Activate it before running these targets:
+#   source <your-venv>/bin/activate
 
 .PHONY: client-build
-client-build: client-setup-env ## Build client distribution. Pass FORMAT=sdist or FORMAT=wheel to build a specific format.
+client-build: ## Build client distribution. Pass FORMAT=sdist or FORMAT=wheel to build a specific format.
 	@echo "--- Building client distribution ---"
 	@if [ -n "$(FORMAT)" ]; then \
 		if [ "$(FORMAT)" != "sdist" ] && [ "$(FORMAT)" != "wheel" ]; then \
@@ -135,30 +218,15 @@ client-build: client-setup-env ## Build client distribution. Pass FORMAT=sdist o
 			exit 1; \
 		fi; \
 		echo "Building with format: $(FORMAT)"; \
-		$(ACTIVATE_AND_CD) && uv build --format $(FORMAT); \
+		cd $(PYTHON_CLIENT_DIR) && uv build --format $(FORMAT); \
 	else \
 		echo "Building default distribution (sdist and wheel)"; \
-		$(ACTIVATE_AND_CD) && uv build; \
+		cd $(PYTHON_CLIENT_DIR) && uv build; \
 	fi
 	@echo "--- Client distribution build complete ---"
 
-.PHONY: client-cleanup
-client-cleanup: ## Cleanup virtual environment and Python cache files
-	@echo "--- Cleaning up virtual environment and Python cache files ---"
-	@echo "Attempting to remove virtual environment directory: $(VENV_DIR)..."
-	@if [ -n "$(VENV_DIR)" ] && [ -d "$(VENV_DIR)" ]; then \
-		rm -rf "$(VENV_DIR)"; \
-		echo "Virtual environment removed."; \
-	else \
-		echo "Virtual environment directory '$(VENV_DIR)' not found or VENV_DIR is empty. No action taken."; \
-	fi
-	@echo "Cleaning up Python cache files..."
-	@find $(PYTHON_CLIENT_DIR) -type f -name "*.pyc" -delete
-	@find $(PYTHON_CLIENT_DIR) -type d -name "__pycache__" -delete
-	@echo "--- Virtual environment and Python cache cleanup complete ---"
-
 .PHONY: client-integration-test
-client-integration-test: build-server client-setup-env ## Run client integration tests
+client-integration-test: build-server ## Run client integration tests
 	@echo "--- Starting client integration tests ---"
 	@echo "Ensuring Docker Compose services are stopped and removed..."
 	@$(DOCKER) compose -f $(PYTHON_CLIENT_DIR)/docker-compose.yml kill || true # `|| true` prevents make from failing if containers don't exist
@@ -171,27 +239,27 @@ client-integration-test: build-server client-setup-env ## Run client integration
 		sleep 2; \
 	done
 	@echo "Polaris is healthy. Starting integration tests..."
-	@$(ACTIVATE_AND_CD) && uv run --active pytest integration_tests/
+	@cd $(PYTHON_CLIENT_DIR) && uv run --active pytest integration_tests/
 	@echo "--- Client integration tests complete ---"
 	@echo "Tearing down Docker Compose services..."
 	@$(DOCKER) compose -f $(PYTHON_CLIENT_DIR)/docker-compose.yml down || true # Ensure teardown even if tests fail
 
 .PHONY: client-license-check
-client-license-check: client-setup-env ## Run license compliance check
+client-license-check: ## Run license compliance check
 	@echo "--- Starting license compliance check ---"
-	@$(ACTIVATE_AND_CD) && pip-licenses
+	@cd $(PYTHON_CLIENT_DIR) && pip-licenses
 	@echo "--- License compliance check complete ---"
 
 .PHONY: client-lint
-client-lint: client-setup-env ## Run linting checks for Polaris client
+client-lint: ## Run linting checks for Polaris client
 	@echo "--- Running client linting checks ---"
-	@$(ACTIVATE_AND_CD) && uv run --active pre-commit run --files integration_tests/* generate_clients.py apache_polaris/cli/* apache_polaris/cli/command/* apache_polaris/cli/options/* test/*
+	@cd $(PYTHON_CLIENT_DIR) && uv run --active pre-commit run --files integration_tests/* generate_clients.py apache_polaris/cli/* apache_polaris/cli/command/* apache_polaris/cli/options/* test/*
 	@echo "--- Client linting checks complete ---"
 
 .PHONY: client-nightly-publish
-client-nightly-publish: client-setup-env ## Build and publish nightly version to Test PyPI
+client-nightly-publish: ## Build and publish nightly version to Test PyPI
 	@echo "--- Starting nightly publish ---"
-	@$(ACTIVATE_AND_CD) && \
+	@cd $(PYTHON_CLIENT_DIR) && \
 	CURRENT_VERSION=$$(uv version --short) && \
 	DATE_SUFFIX=$$(date -u +%Y%m%d%H%M%S) && \
 	NIGHTLY_VERSION="$${CURRENT_VERSION}.dev$${DATE_SUFFIX}" && \
@@ -202,15 +270,15 @@ client-nightly-publish: client-setup-env ## Build and publish nightly version to
 	@echo "--- Nightly publish complete ---"
 
 .PHONY: client-regenerate
-client-regenerate: client-setup-env ## Regenerate the client code
+client-regenerate: ## Regenerate the client code
 	@echo "--- Regenerating client code ---"
-	@$(ACTIVATE_AND_CD) && $(PYTHON) -B generate_clients.py
+	@cd $(PYTHON_CLIENT_DIR) && $(PYTHON) -B generate_clients.py
 	@echo "--- Client code regeneration complete ---"
 
 .PHONY: client-unit-test
-client-unit-test: client-setup-env ## Run client unit tests
+client-unit-test: ## Run client unit tests
 	@echo "--- Running client unit tests ---"
-	@$(ACTIVATE_AND_CD) && uv run --active pytest tests/
+	@cd $(PYTHON_CLIENT_DIR) && uv run --active pytest tests/
 	@echo "--- Client unit tests complete ---"
 
 ##@ Helm

@@ -42,7 +42,6 @@ public final class RangerTestProfiles {
           "/authz_it_tests");
       config.put("polaris.features.\"SUPPORTED_CATALOG_STORAGE_TYPES\"", "[\"FILE\"]");
       config.put("polaris.features.\"ALLOW_INSECURE_STORAGE_TYPES\"", "true");
-      config.put("polaris.readiness.ignore-severe-issues", "true");
       return config;
     }
   }

@@ -65,7 +65,7 @@ class OpaPolarisAuthorizerFactory implements PolarisAuthorizerFactory {
   }
 
   /**
-   * Gets the OPA authorization configuration. Used by OpaProductionReadinessCheck
+   * Gets the OPA authorization configuration.
    *
    * @return the OPA configuration
    */

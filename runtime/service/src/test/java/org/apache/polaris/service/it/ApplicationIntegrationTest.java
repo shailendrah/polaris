@@ -63,9 +63,7 @@ public class ApplicationIntegrationTest extends PolarisApplicationIntegrationTes
           "polaris.features.\"ALLOW_INSECURE_STORAGE_TYPES\"",
           "true",
           "polaris.features.\"SUPPORTED_CATALOG_STORAGE_TYPES\"",
-          "[\"FILE\",\"S3\"]",
-          "polaris.readiness.ignore-severe-issues",
-          "true");
+          "[\"FILE\",\"S3\"]");
     }
   }
 

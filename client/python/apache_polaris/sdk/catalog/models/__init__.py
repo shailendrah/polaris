@@ -17,25 +17,3 @@
 # under the License.
 #
 
-services:
-  polaris:
-    image: apache/polaris:latest
-    ports:
-      - "8181:8181"
-      - "8182:8182"
-    environment:
-      AWS_REGION: us-west-2
-      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,root,s3cr3t
-      polaris.realm-context.realms: POLARIS
-      quarkus.log.file.enabled: "false"
-      quarkus.otel.sdk.disabled: "true"
-      polaris.features."DROP_WITH_PURGE_ENABLED": "true"
-      polaris.features."ALLOW_INSECURE_STORAGE_TYPES": "true"
-      polaris.features."SUPPORTED_CATALOG_STORAGE_TYPES": "[\"FILE\",\"S3\",\"GCS\",\"AZURE\"]"
-    healthcheck:
-      test: ["CMD", "curl", "http://localhost:8182/q/health"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
