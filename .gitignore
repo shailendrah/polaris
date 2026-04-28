@@ -1,0 +1,47 @@
+# Gradle
+.gradle/
+build/
+**/build/
+gradle-app.setting
+.gradletasknamecache
+
+# Gradle wrapper jar is tracked, but keep cache directories local
+gradle/wrapper/dists/
+
+# IDE: IntelliJ / Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# IDE: VS Code
+.vscode/
+
+# IDE: Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python (regtests, scripts)
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Node (docs site, generators)
+node_modules/
+
+# Logs
+*.log
+
+# Temp / local
+*.swp
+*.tmp
+*.bak

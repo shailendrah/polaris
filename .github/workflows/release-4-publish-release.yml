@@ -1,0 +1,449 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+name: Release - 4 - Publish Release After Vote Success
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode (check to enable, uncheck to perform actual operations)'
+        required: false
+        type: boolean
+        default: true
+      staging_repository_id:
+        description: 'Nexus staging repository ID to release (e.g., orgapachepolaris-1234)'
+        required: true
+        type: string
+
+jobs:
+  publish-release:
+    name: Release - 4 - Publish Release After Vote Success
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with: # zizmor: ignore[artipacked]
+          # Fetch full history for proper branch operations
+          fetch-depth: 0
+          # Use a token with write permissions - persist-credentials is required for git push
+          token: ${{ secrets.GITHUB_TOKEN }} # zizmor: ignore[secrets-outside-env]
+
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-env
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Set up environment variables
+        env:
+          DRY_RUN_INPUT: ${{ github.event.inputs.dry_run }}
+          STAGING_REPO_ID_INPUT: ${{ github.event.inputs.staging_repository_id }}
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+          echo "## Mode" >> $GITHUB_STEP_SUMMARY
+          if [[ "${DRY_RUN_INPUT}" == "true" ]]; then
+            echo "DRY_RUN=1" >> $GITHUB_ENV
+            echo "‼️ DRY_RUN mode enabled - No actual changes will be made" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "DRY_RUN=0" >> $GITHUB_ENV
+            echo "DRY_RUN mode disabled - Performing actual operations" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Validate staging repository ID parameter
+          staging_repo_id="${STAGING_REPO_ID_INPUT}"
+          if [[ -z "${staging_repo_id}" ]]; then
+            echo "❌ Staging repository ID is required but not provided." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          echo "STAGING_REPOSITORY_ID=${staging_repo_id}" >> $GITHUB_ENV
+
+      - name: Install Subversion
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+
+      - name: Auto-determine release parameters from branch and Git state
+        env:
+          GIT_REF: ${{ github.ref }}
+        run: |
+          source "${LIBS_DIR}/_version.sh"
+
+          echo "## Parameters" >> $GITHUB_STEP_SUMMARY
+
+          # Extract the ref name from github.ref
+          # github.ref format: refs/heads/branch-name or refs/tags/tag-name
+          ref="${GIT_REF}"
+
+          if [[ "${ref}" =~ ^refs/heads/release/(.+)$ ]]; then
+            # Running from a release branch
+            branch_version="${BASH_REMATCH[1]}"
+            current_branch="release/${branch_version}"
+          else
+            echo "❌ This workflow must be run from a release branch (release/major.minor.x)." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Current ref: \`${ref}\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please select a release branch (e.g., \`release/1.0.x\`) from the 'Use workflow from' dropdown in the GitHub UI." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          # Validate branch version format and extract components
+          if ! validate_and_extract_branch_version "${branch_version}"; then
+            echo "❌ Invalid release branch version format: \`${branch_version}\`. Expected format: major.minor.x." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          # Find the patch number for this major.minor version by looking at existing tags
+          # Note: find_next_patch_number returns the current patch if no final tag exists,
+          # which is exactly what we need for publishing (we publish from an RC that has no final tag yet)
+          find_next_patch_number "${major}" "${minor}"
+
+          # Build the version string for the patch with RC tags
+          version_without_rc="${major}.${minor}.${patch}"
+
+          # Find the latest RC tag for this version
+          find_next_rc_number "${version_without_rc}"
+          latest_rc=$((rc_number - 1))
+
+          if [[ ${latest_rc} -lt 0 ]]; then
+            echo "❌ No RC tags found for version \`${version_without_rc}\`. Expected at least one RC to be created before publishing a release." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          rc_tag="apache-polaris-${version_without_rc}-rc${latest_rc}"
+
+          # Verify the RC tag exists
+          if ! git rev-parse "${rc_tag}" >/dev/null 2>&1; then
+            echo "❌ RC tag \`${rc_tag}\` does not exist in repository." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          # Verify that current HEAD is at the RC tag commit
+          rc_commit=$(git rev-parse "${rc_tag}")
+          current_commit=$(git rev-parse HEAD)
+
+          if [[ "${current_commit}" != "${rc_commit}" ]]; then
+            echo "❌ Current HEAD (\`${current_commit}\`) does not match RC tag \`${rc_tag}\` (\`${rc_commit}\`)." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "This means that some commits have been made on the release branch after the last RC was created." >> $GITHUB_STEP_SUMMARY
+            echo "You should not publish a release from a branch that has received additional commits after the last RC was created." >> $GITHUB_STEP_SUMMARY
+            echo "Either remove the commits from the release branch so that it points to the last RC that was voted on, or create a new RC from the current state of the branch." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          echo "✅ Current HEAD matches RC tag \`${rc_tag}\`" >> $GITHUB_STEP_SUMMARY
+
+          # Create final release tag name
+          final_release_tag="apache-polaris-${version_without_rc}"
+
+          # Check if final release tag already exists
+          if git rev-parse "${final_release_tag}" >/dev/null 2>&1; then
+            echo "❌ Final release tag \`${final_release_tag}\` already exists. This release may have already been published." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          # Export variables for next steps
+          echo "version_without_rc=${version_without_rc}" >> $GITHUB_ENV
+          echo "rc_tag=${rc_tag}" >> $GITHUB_ENV
+          echo "final_release_tag=${final_release_tag}" >> $GITHUB_ENV
+          echo "release_branch=${current_branch}" >> $GITHUB_ENV
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          | Parameter | Value |
+          | --- | --- |
+          | Version | \`${version_without_rc}\` |
+          | RC tag to promote | \`${rc_tag}\` |
+          | Final release tag | \`${final_release_tag}\` |
+          | Release branch | \`${current_branch}\` |
+          | Staging Repository ID | \`${staging_repo_id}\` |
+          EOT
+
+      - name: Copy distribution from SVN dev to release space
+        env:
+          SVN_USERNAME: ${{ secrets.POLARIS_SVN_DEV_USERNAME }} # zizmor: ignore[secrets-outside-env]
+          SVN_PASSWORD: ${{ secrets.POLARIS_SVN_DEV_PASSWORD }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+
+          source "${LIBS_DIR}/_constants.sh"
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Define source and destination URLs
+          dev_artifacts_url="${APACHE_DIST_URL}/dev/polaris/${version_without_rc}"
+          release_artifacts_url="${APACHE_DIST_URL}/release/polaris/${version_without_rc}"
+
+          dev_helm_url="${APACHE_DIST_URL}/dev/polaris/helm-chart/${version_without_rc}"
+          release_helm_url="${APACHE_DIST_URL}/release/polaris/helm-chart/${version_without_rc}"
+
+          exec_process svn mv --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive \
+            "${dev_artifacts_url}" "${release_artifacts_url}" \
+            -m "Release Apache Polaris ${version_without_rc}"
+
+          exec_process svn mv --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive \
+            "${dev_helm_url}" "${release_helm_url}" \
+            -m "Release Apache Polaris Helm chart ${version_without_rc}"
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Distribution
+          Artifacts and Helm chart moved from dist dev to dist release
+          EOT
+
+      - name: Clean up old releases from dist release repository
+        env:
+          SVN_USERNAME: ${{ secrets.POLARIS_SVN_DEV_USERNAME }} # zizmor: ignore[secrets-outside-env]
+          SVN_PASSWORD: ${{ secrets.POLARIS_SVN_DEV_PASSWORD }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+
+          source "${LIBS_DIR}/_constants.sh"
+          source "${LIBS_DIR}/_exec.sh"
+
+          release_artifacts_url="${APACHE_DIST_URL}/release/polaris"
+          release_helm_url="${APACHE_DIST_URL}/release/polaris/helm-chart"
+
+          # List and remove old release artifact versions
+          old_versions=$(svn list --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive "${release_artifacts_url}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+(-incubating)?/$' | sed 's|/$||' | grep -v "^${version_without_rc}$" || true)
+
+          if [[ -n "${old_versions}" ]]; then
+            echo "## Old Releases Cleanup" >> $GITHUB_STEP_SUMMARY
+            echo "Removing old release versions:" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "${old_versions}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            for old_version in ${old_versions}; do
+              exec_process svn rm --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive \
+                "${release_artifacts_url}/${old_version}" \
+                -m "Remove old release ${old_version} (superseded by ${version_without_rc})"
+            done
+          else
+            echo "## Old Releases Cleanup" >> $GITHUB_STEP_SUMMARY
+            echo "No old release versions found to remove" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # List and remove old Helm chart versions
+          old_helm_versions=$(svn list --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive "${release_helm_url}" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+(-incubating)?/$' | sed 's|/$||' | grep -v "^${version_without_rc}$" || true)
+
+          if [[ -n "${old_helm_versions}" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Removing old Helm chart versions:" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "${old_helm_versions}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            for old_helm_version in ${old_helm_versions}; do
+              exec_process svn rm --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive \
+                "${release_helm_url}/${old_helm_version}" \
+                -m "Remove old Helm chart ${old_helm_version} (superseded by ${version_without_rc})"
+            done
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "No old Helm chart versions found to remove" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Transfer Helm index and artifacthub-repo.yml from dev to release
+        env:
+          SVN_USERNAME: ${{ secrets.POLARIS_SVN_DEV_USERNAME }} # zizmor: ignore[secrets-outside-env]
+          SVN_PASSWORD: ${{ secrets.POLARIS_SVN_DEV_PASSWORD }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+
+          source "${LIBS_DIR}/_constants.sh"
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Define source and destination URLs
+          dev_helm_chart_url="${APACHE_DIST_URL}/dev/polaris/helm-chart"
+          release_helm_chart_url="${APACHE_DIST_URL}/release/polaris/helm-chart"
+
+          # Move index.yaml and artifacthub-repo.yml from dev to release
+          # The index was already properly generated in workflow 3 with relative URLs for the current
+          # release and absolute URLs to archive.apache.org for previous releases, so we just transfer it as-is
+          exec_process svn mv --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive \
+            "${dev_helm_chart_url}/index.yaml" \
+            "${dev_helm_chart_url}/artifacthub-repo.yml" \
+            "${release_helm_chart_url}/" \
+            -m "Transfer Helm index and artifacthub-repo.yml for ${version_without_rc} release"
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Helm Repository Metadata
+          Helm index and artifacthub-repo.yml transferred from dist dev to dist release
+          EOT
+
+      - name: Create final release tag and push to Git repository
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Get the commit SHA that the RC tag points to
+          rc_commit=$(git rev-parse "${rc_tag}")
+          echo "rc_commit=${rc_commit}" >> $GITHUB_ENV
+
+          exec_process git tag -a "${final_release_tag}" "${rc_commit}" -m "Apache Polaris ${version_without_rc} Release"
+          exec_process git push apache "${final_release_tag}"
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Git Release Tag
+          Final release tag \`${final_release_tag}\` created and pushed
+          EOT
+
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx use default
+          docker buildx create \
+          --platform linux/amd64,linux/arm64 \
+          --use \
+          --name polarisbuild \
+          --driver-opt network=host || docker buildx use polarisbuild
+          docker buildx inspect
+
+      - name: Set up Java
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Log in to Docker Hub
+        if: env.DRY_RUN == '0'
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }} # zizmor: ignore[secrets-outside-env]
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          echo "${DOCKERHUB_TOKEN}" | docker login ghcr.io -u "${DOCKERHUB_USER}" --password-stdin
+
+      - name: Publish Polaris Server Docker image to Docker Hub
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          exec_process ./gradlew :polaris-server:assemble :polaris-server:quarkusAppPartsBuild --rerun \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.container-image.push=true \
+            -Dquarkus.docker.buildx.platform="linux/amd64,linux/arm64" \
+            -Dquarkus.container-image.tag="${final_release_tag}"
+
+      - name: Publish Polaris Admin Tool Docker image to Docker Hub
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          exec_process ./gradlew :polaris-admin:assemble :polaris-admin:quarkusAppPartsBuild --rerun \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.container-image.push=true \
+            -Dquarkus.docker.buildx.platform="linux/amd64,linux/arm64" \
+            -Dquarkus.container-image.tag="${final_release_tag}"
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Docker Images
+          ✅ Polaris Server and Admin Tool Docker images published to Docker Hub
+          EOT
+
+      - name: Create GitHub release with artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # zizmor: ignore[secrets-outside-env]
+          SVN_USERNAME: ${{ secrets.POLARIS_SVN_DEV_USERNAME }} # zizmor: ignore[secrets-outside-env]
+          SVN_PASSWORD: ${{ secrets.POLARIS_SVN_DEV_PASSWORD }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+
+          source "${LIBS_DIR}/_constants.sh"
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Create a temporary directory for downloading artifacts
+          artifacts_dir="${RELEASEY_DIR}/release-artifacts"
+          exec_process mkdir -p "${artifacts_dir}"
+
+          # Download artifacts from Apache dist release space
+          release_artifacts_url="${APACHE_DIST_URL}/release/polaris/${version_without_rc}"
+          release_helm_url="${APACHE_DIST_URL}/release/polaris/helm-chart/${version_without_rc}"
+
+          # Download main artifacts
+          exec_process svn export --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive \
+            "${release_artifacts_url}" "${artifacts_dir}/artifacts"
+
+          # Download Helm chart artifacts
+          exec_process svn export --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive \
+            "${release_helm_url}" "${artifacts_dir}/helm"
+
+          # Prepare the content of the Github Release
+          # ********************************************************************************
+          release_title="Release ${version_without_rc}"
+          release_notes="Apache Polaris ${version_without_rc} Release
+
+          ## Release Artifacts
+          This release includes:
+          - Source and binary distributions
+          - Helm chart package
+          - Docker images published to Docker Hub
+          - Maven artifacts published to Maven Central
+
+          ## Verification
+          All artifacts have been signed with GPG and include SHA-512 checksums for verification.
+
+          ## Docker Images
+          - \`apache/polaris:${final_release_tag}\` - Polaris Server
+          - \`apache/polaris-admin:${final_release_tag}\` - Polaris Admin Tool"
+          # ********************************************************************************
+
+          # Collect all artifacts to attach from the artifacts directory
+          readarray -t artifacts_to_attach < <(find "${artifacts_dir}" -type f -name "*.tar.gz" -o -name "*.tgz" -o -name "*.asc" -o -name "*.sha512" -o -name "*.prov")
+
+          # Create GitHub release and immediately publish it
+          exec_process gh release create \
+            --title "${release_title}" \
+            --notes "${release_notes}" \
+            --target "${rc_commit}" \
+            "${final_release_tag}" \
+            "${artifacts_to_attach[@]}"
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## GitHub Release
+          GitHub release created: \`${final_release_tag}\`
+          EOT
+
+      - name: Release candidate repository on Nexus
+        env:
+          ORG_GRADLE_PROJECT_apacheUsername: ${{ secrets.NEXUS_STAGE_DEPLOYER_USER }} # zizmor: ignore[secrets-outside-env]
+          ORG_GRADLE_PROJECT_apachePassword: ${{ secrets.NEXUS_STAGE_DEPLOYER_PW }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Use the Gradle task to release the Apache staging repository with the specific staging repository ID
+          exec_process ./gradlew releaseApacheStagingRepository --staging-repository-id "${STAGING_REPOSITORY_ID}"
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Summary
+          🎉 Release published successfully:
+
+          | Component | Status |
+          | --- | --- |
+          | Distribution artifacts | ✅ Moved to release space |
+          | Helm chart and index | ✅ Updated in release space |
+          | Old releases cleanup | ✅ Removed from dist release |
+          | Git release tag | ✅ Created and pushed |
+          | GitHub release | ✅ Created with artifacts attached |
+          | Docker images | ✅ Published to Docker Hub |
+          | Nexus repository | ✅ Released |
+          | Version | \`${version_without_rc}\` |
+          | Final release tag | \`${final_release_tag}\` |
+          EOT

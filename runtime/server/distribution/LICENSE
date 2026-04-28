@@ -1,0 +1,2167 @@
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+--------------------------------------------------------------------------------
+
+This product bundles and includes code from Apache Iceberg.
+
+* Maven group:artifact IDs: org.apache.iceberg:iceberg-api
+* Maven group:artifact IDs: org.apache.iceberg:iceberg-aws
+* Maven group:artifact IDs: org.apache.iceberg:iceberg-azure
+* Maven group:artifact IDs: org.apache.iceberg:iceberg-bundled-guava
+* Maven group:artifact IDs: org.apache.iceberg:iceberg-common
+* Maven group:artifact IDs: org.apache.iceberg:iceberg-core
+* Maven group:artifact IDs: org.apache.iceberg:iceberg-gcp
+
+Copyright: Copyright 2017-2025 The Apache Software Foundation
+Home page: https://iceberg.apache.org
+License: https://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles and includes code from Netty.
+
+* Maven group:artifact IDs: io.netty:netty-buffer
+* Maven group:artifact IDs: io.netty:netty-codec
+* Maven group:artifact IDs: io.netty:netty-codec-dns
+* Maven group:artifact IDs: io.netty:netty-codec-haproxy
+* Maven group:artifact IDs: io.netty:netty-codec-http
+* Maven group:artifact IDs: io.netty:netty-codec-http2
+* Maven group:artifact IDs: io.netty:netty-codec-socks
+* Maven group:artifact IDs: io.netty:netty-common
+* Maven group:artifact IDs: io.netty:netty-handler
+* Maven group:artifact IDs: io.netty:netty-handler-proxy
+* Maven group:artifact IDs: io.netty:netty-resolver
+* Maven group:artifact IDs: io.netty:netty-resolver-dns
+* Maven group:artifact IDs: io.netty:netty-resolver-dns-classes-macos
+* Maven group:artifact IDs: io.netty:netty-resolver-dns-native-macos
+* Maven group:artifact IDs: io.netty:netty-tcnative-boringssl-static
+* Maven group:artifact IDs: io.netty:netty-tcnative-classes
+* Maven group:artifact IDs: io.netty:netty-transport
+* Maven group:artifact IDs: io.netty:netty-transport-classes-epoll
+* Maven group:artifact IDs: io.netty:netty-transport-classes-kqueue
+* Maven group:artifact IDs: io.netty:netty-transport-native-epoll
+* Maven group:artifact IDs: io.netty:netty-transport-native-kqueue
+* Maven group:artifact IDs: io.netty:netty-transport-native-unix-common
+
+Copyright: Copyright © 2025 The Netty project
+Home page: https://netty.io/
+License: https://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles org.crac.
+
+* Maven group:artifact IDs: org.crac:crac
+
+Project URL: https://github.com/crac/org.crac
+License: BSD 2-Clause
+| Copyright 2017-2022 Azul Systems, Inc.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are met:
+| 
+| 1. Redistributions of source code must retain the above copyright notice,
+| this list of conditions and the following disclaimer.
+| 
+| 2. Redistributions in binary form must reproduce the above copyright notice,
+| this list of conditions and the following disclaimer in the documentation
+| and/or other materials provided with the distribution.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+| AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+| IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+| ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+| LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+| CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+| SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+| INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+| CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+| ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+| POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Quarkus.
+
+* Maven group:artifact IDs: io.quarkus.arc:arc
+* Maven group:artifact IDs: io.quarkus.resteasy.reactive:resteasy-reactive
+* Maven group:artifact IDs: io.quarkus.resteasy.reactive:resteasy-reactive-common
+* Maven group:artifact IDs: io.quarkus.resteasy.reactive:resteasy-reactive-common-types
+* Maven group:artifact IDs: io.quarkus.resteasy.reactive:resteasy-reactive-jackson
+* Maven group:artifact IDs: io.quarkus.resteasy.reactive:resteasy-reactive-vertx
+* Maven group:artifact IDs: io.quarkus.security:quarkus-security
+* Maven group:artifact IDs: io.quarkus.vertx.utils:quarkus-vertx-utils
+* Maven group:artifact IDs: io.quarkus:quarkus-agroal
+* Maven group:artifact IDs: io.quarkus:quarkus-apache-httpclient
+* Maven group:artifact IDs: io.quarkus:quarkus-arc
+* Maven group:artifact IDs: io.quarkus:quarkus-bootstrap-runner
+* Maven group:artifact IDs: io.quarkus:quarkus-classloader-commons
+* Maven group:artifact IDs: io.quarkus:quarkus-container-image
+* Maven group:artifact IDs: io.quarkus:quarkus-container-image-docker
+* Maven group:artifact IDs: io.quarkus:quarkus-container-image-docker-common
+* Maven group:artifact IDs: io.quarkus:quarkus-core
+* Maven group:artifact IDs: io.quarkus:quarkus-credentials
+* Maven group:artifact IDs: io.quarkus:quarkus-datasource
+* Maven group:artifact IDs: io.quarkus:quarkus-datasource-common
+* Maven group:artifact IDs: io.quarkus:quarkus-devservices
+* Maven group:artifact IDs: io.quarkus:quarkus-development-mode-spi
+* Maven group:artifact IDs: io.quarkus:quarkus-fs-util
+* Maven group:artifact IDs: io.quarkus:quarkus-grpc-common
+* Maven group:artifact IDs: io.quarkus:quarkus-hibernate-validator
+* Maven group:artifact IDs: io.quarkus:quarkus-ide-launcher
+* Maven group:artifact IDs: io.quarkus:quarkus-jackson
+* Maven group:artifact IDs: io.quarkus:quarkus-jsonp
+* Maven group:artifact IDs: io.quarkus:quarkus-logging-json
+* Maven group:artifact IDs: io.quarkus:quarkus-micrometer
+* Maven group:artifact IDs: io.quarkus:quarkus-micrometer-registry-prometheus
+* Maven group:artifact IDs: io.quarkus:quarkus-mutiny
+* Maven group:artifact IDs: io.quarkus:quarkus-mutiny-reactive-streams-operators
+* Maven group:artifact IDs: io.quarkus:quarkus-narayana-jta
+* Maven group:artifact IDs: io.quarkus:quarkus-netty
+* Maven group:artifact IDs: io.quarkus:quarkus-oidc
+* Maven group:artifact IDs: io.quarkus:quarkus-oidc-common
+* Maven group:artifact IDs: io.quarkus:quarkus-opentelemetry
+* Maven group:artifact IDs: io.quarkus:quarkus-proxy-registry
+* Maven group:artifact IDs: io.quarkus:quarkus-reactive-routes
+* Maven group:artifact IDs: io.quarkus:quarkus-rest
+* Maven group:artifact IDs: io.quarkus:quarkus-rest-common
+* Maven group:artifact IDs: io.quarkus:quarkus-rest-jackson
+* Maven group:artifact IDs: io.quarkus:quarkus-rest-jackson-common
+* Maven group:artifact IDs: io.quarkus:quarkus-security
+* Maven group:artifact IDs: io.quarkus:quarkus-security-runtime-spi
+* Maven group:artifact IDs: io.quarkus:quarkus-smallrye-context-propagation
+* Maven group:artifact IDs: io.quarkus:quarkus-smallrye-fault-tolerance
+* Maven group:artifact IDs: io.quarkus:quarkus-smallrye-health
+* Maven group:artifact IDs: io.quarkus:quarkus-smallrye-jwt-build
+* Maven group:artifact IDs: io.quarkus:quarkus-tls-registry
+* Maven group:artifact IDs: io.quarkus:quarkus-tls-registry-spi
+* Maven group:artifact IDs: io.quarkus:quarkus-transaction-annotations
+* Maven group:artifact IDs: io.quarkus:quarkus-vertx
+* Maven group:artifact IDs: io.quarkus:quarkus-vertx-http
+* Maven group:artifact IDs: io.quarkus:quarkus-vertx-latebound-mdc-provider
+* Maven group:artifact IDs: io.quarkus:quarkus-value-registry
+* Maven group:artifact IDs: io.quarkus:quarkus-virtual-threads
+* Maven group:artifact IDs: io.quarkus:quarkus-websockets-next-spi
+
+Project URL: https://quarkus.io/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles several SmallRye project artifacts.
+
+* Maven group:artifact IDs: io.smallrye.certs:smallrye-private-key-pem-parser
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-annotation
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-classloader
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-constraint
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-cpu
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-expression
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-function
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-io
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-net
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-os
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-ref
+* Maven group:artifact IDs: io.smallrye.common:smallrye-common-vertx-context
+* Maven group:artifact IDs: io.smallrye.config:smallrye-config
+* Maven group:artifact IDs: io.smallrye.config:smallrye-config-common
+* Maven group:artifact IDs: io.smallrye.config:smallrye-config-core
+* Maven group:artifact IDs: io.smallrye.config:smallrye-config-validator
+* Maven group:artifact IDs: io.smallrye.reactive:mutiny
+* Maven group:artifact IDs: io.smallrye.reactive:mutiny-reactive-streams-operators
+* Maven group:artifact IDs: io.smallrye.reactive:mutiny-smallrye-context-propagation
+* Maven group:artifact IDs: io.smallrye.reactive:mutiny-zero-flow-adapters
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-mutiny-vertx-auth-common
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-mutiny-vertx-bridge-common
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-mutiny-vertx-core
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-mutiny-vertx-runtime
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-mutiny-vertx-uri-template
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-mutiny-vertx-web
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-mutiny-vertx-web-client
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-mutiny-vertx-web-common
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-reactive-converter-api
+* Maven group:artifact IDs: io.smallrye.reactive:smallrye-reactive-converter-mutiny
+* Maven group:artifact IDs: io.smallrye.reactive:vertx-mutiny-generator
+* Maven group:artifact IDs: io.smallrye:smallrye-context-propagation
+* Maven group:artifact IDs: io.smallrye:smallrye-context-propagation-api
+* Maven group:artifact IDs: io.smallrye:smallrye-context-propagation-jta
+* Maven group:artifact IDs: io.smallrye:smallrye-context-propagation-storage
+* Maven group:artifact IDs: io.smallrye:smallrye-fault-tolerance
+* Maven group:artifact IDs: io.smallrye:smallrye-fault-tolerance-api
+* Maven group:artifact IDs: io.smallrye:smallrye-fault-tolerance-apiimpl
+* Maven group:artifact IDs: io.smallrye:smallrye-fault-tolerance-autoconfig-core
+* Maven group:artifact IDs: io.smallrye:smallrye-fault-tolerance-context-propagation
+* Maven group:artifact IDs: io.smallrye:smallrye-fault-tolerance-core
+* Maven group:artifact IDs: io.smallrye:smallrye-fault-tolerance-mutiny
+* Maven group:artifact IDs: io.smallrye:smallrye-fault-tolerance-vertx
+* Maven group:artifact IDs: io.smallrye:smallrye-health
+* Maven group:artifact IDs: io.smallrye:smallrye-health-api
+* Maven group:artifact IDs: io.smallrye:smallrye-health-provided-checks
+* Maven group:artifact IDs: io.smallrye:smallrye-jwt
+* Maven group:artifact IDs: io.smallrye:smallrye-jwt-build
+* Maven group:artifact IDs: io.smallrye:smallrye-jwt-common
+
+Project URL: https://smallrye.io/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Quarkus Amazon Services.
+
+* Maven group:artifact IDs: io.quarkiverse.amazonservices:quarkus-amazon-apache-client-internal
+* Maven group:artifact IDs: io.quarkiverse.amazonservices:quarkus-amazon-common
+* Maven group:artifact IDs: io.quarkiverse.amazonservices:quarkus-amazon-common-spi
+* Maven group:artifact IDs: io.quarkiverse.amazonservices:quarkus-amazon-netty-client-internal
+* Maven group:artifact IDs: io.quarkiverse.amazonservices:quarkus-amazon-opentelemetry-internal
+* Maven group:artifact IDs: io.quarkiverse.amazonservices:quarkus-amazon-rds
+
+Project URL: https://github.com/quarkiverse/quarkus-amazon-services
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Parsson.
+
+* Maven group:artifact IDs: org.eclipse.parsson:parsson
+
+Project URL: https://github.com/eclipse-ee4j/parsson
+License: Eclipse Public License 2.0 - https://projects.eclipse.org/license/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles JBoss Logging.
+
+* Maven group:artifact IDs: org.jboss.logging:jboss-logging
+* Maven group:artifact IDs: org.jboss.logmanager:jboss-logmanager
+
+Project URL: http://www.jboss.org
+License: Apache License 2.0 - https://repository.jboss.org/licenses/apache-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Brotli4j.
+
+* Maven group:artifact IDs: com.aayushatharva.brotli4j:brotli4j
+* Maven group:artifact IDs: com.aayushatharva.brotli4j:service
+
+Project URL: https://github.com/hyperxpro/Brotli4j
+License: Apache License 2.0 - https://github.com/hyperxpro/Brotli4j/blob/v1.16.0/LICENSE
+
+--------------------------------------------------------------------------------
+
+This product bundles Auth0 Java JWT.
+
+* Maven group:artifact IDs: com.auth0:java-jwt
+
+Project URL: https://github.com/auth0/java-jwt
+License: MIT License
+| The MIT License (MIT)
+|  
+| Copyright (c) 2015 Auth0, Inc. <support@auth0.com> (http://auth0.com)
+|  
+| Permission is hereby granted, free of charge, to any person obtaining a copy
+| of this software and associated documentation files (the "Software"), to deal
+| in the Software without restriction, including without limitation the rights
+| to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+| copies of the Software, and to permit persons to whom the Software is
+| furnished to do so, subject to the following conditions:
+|  
+| The above copyright notice and this permission notice shall be included in all
+| copies or substantial portions of the Software.
+|  
+| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+| IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+| FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+| AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+| LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+| OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+| SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Azure SDK for Java.
+
+* Maven group:artifact IDs: com.azure:azure-core
+* Maven group:artifact IDs: com.azure:azure-core-http-netty
+* Maven group:artifact IDs: com.azure:azure-identity
+* Maven group:artifact IDs: com.azure:azure-json
+* Maven group:artifact IDs: com.azure:azure-storage-blob
+* Maven group:artifact IDs: com.azure:azure-storage-common
+* Maven group:artifact IDs: com.azure:azure-storage-file-datalake
+* Maven group:artifact IDs: com.azure:azure-storage-internal-avro
+* Maven group:artifact IDs: com.azure:azure-xml
+
+Project URL: https://github.com/Azure/azure-sdk-for-java
+License: MIT License
+| The MIT License (MIT)
+| 
+| Copyright (c) 2015 Microsoft
+| 
+| Permission is hereby granted, free of charge, to any person obtaining a copy
+| of this software and associated documentation files (the "Software"), to deal
+| in the Software without restriction, including without limitation the rights
+| to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+| copies of the Software, and to permit persons to whom the Software is
+| furnished to do so, subject to the following conditions:
+| 
+| The above copyright notice and this permission notice shall be included in all
+| copies or substantial portions of the Software.
+| 
+| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+| IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+| FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+| AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+| LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+| OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+| SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+This product bundles FasterXML Java Classmate.
+
+* Maven group:artifact IDs: com.fasterxml:classmate
+
+Project URL: https://github.com/FasterXML/java-classmate
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Jackson.
+
+* Maven group:artifact IDs: com.fasterxml.jackson.core:jackson-annotations
+* Maven group:artifact IDs: com.fasterxml.jackson.core:jackson-core
+* Maven group:artifact IDs: com.fasterxml.jackson.core:jackson-databind
+* Maven group:artifact IDs: com.fasterxml.jackson.dataformat:jackson-dataformat-smile
+* Maven group:artifact IDs: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml
+* Maven group:artifact IDs: com.fasterxml.jackson.dataformat:jackson-dataformat-xml
+* Maven group:artifact IDs: com.fasterxml.jackson.datatype:jackson-datatype-guava
+* Maven group:artifact IDs: com.fasterxml.jackson.datatype:jackson-datatype-jdk8
+* Maven group:artifact IDs: com.fasterxml.jackson.datatype:jackson-datatype-jsr310
+* Maven group:artifact IDs: com.fasterxml.jackson.module:jackson-module-parameter-names
+
+Project URL: https://github.com/FasterXML/jackson
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Woodstox.
+
+* Maven group:artifact IDs: com.fasterxml.woodstox:woodstox-core
+
+Project URL: https://github.com/FasterXML/woodstox
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Caffeine.
+
+* Maven group:artifact IDs: com.github.ben-manes.caffeine:caffeine
+
+Project URL: https://github.com/ben-manes/caffeine
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Android Annotations.
+
+* Maven group:artifact IDs: com.google.android:annotations
+
+Project URL: http://source.android.com/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Google API Client.
+
+* Maven group:artifact IDs: com.google.api-client:google-api-client
+
+Project URL: https://github.com/googleapis/google-api-java-client
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Google API Common.
+
+* Maven group:artifact IDs: com.google.api:api-common
+
+Project URL: https://github.com/googleapis/api-common-java
+License: BSD 3-Clause
+| Copyright 2016, Google Inc.
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are
+| met:
+| 
+|    * Redistributions of source code must retain the above copyright
+| notice, this list of conditions and the following disclaimer.
+|    * Redistributions in binary form must reproduce the above
+| copyright notice, this list of conditions and the following disclaimer
+| in the documentation and/or other materials provided with the
+| distribution.
+|    * Neither the name of Google Inc. nor the names of its
+| contributors may be used to endorse or promote products derived from
+| this software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+| OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+| SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+| LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+| THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+| (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Google GAX.
+
+* Maven group:artifact IDs: com.google.api:gax
+* Maven group:artifact IDs: com.google.api:gax-grpc
+* Maven group:artifact IDs: com.google.api:gax-httpjson
+
+Project URL: https://github.com/googleapis/gax-java
+License: BSD 3-Clause
+| Copyright 2016, Google Inc. All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are
+| met:
+| 
+|     * Redistributions of source code must retain the above copyright
+| notice, this list of conditions and the following disclaimer.
+|     * Redistributions in binary form must reproduce the above
+| copyright notice, this list of conditions and the following disclaimer
+| in the documentation and/or other materials provided with the
+| distribution.
+|     * Neither the name of Google Inc. nor the names of its
+| contributors may be used to endorse or promote products derived from
+| this software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+| OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+| SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+| LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+| THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+| (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Google Storage APIs.
+
+* Maven group:artifact IDs: com.google.api.grpc:gapic-google-cloud-storage-v2
+* Maven group:artifact IDs: com.google.api.grpc:grpc-google-cloud-storage-v2
+* Maven group:artifact IDs: com.google.api.grpc:proto-google-cloud-iamcredentials-v1
+* Maven group:artifact IDs: com.google.api.grpc:proto-google-cloud-monitoring-v3
+* Maven group:artifact IDs: com.google.api.grpc:proto-google-cloud-storage-v2
+* Maven group:artifact IDs: com.google.apis:google-api-services-storage
+
+Project URL: https://github.com/googleapis/java-storage
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Google SDK Platform for Java.
+
+* Maven group:artifact IDs: com.google.api.grpc:proto-google-common-protos
+* Maven group:artifact IDs: com.google.api.grpc:proto-google-iam-v1
+
+Project URL: https://github.com/googleapis/sdk-platform-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Google Auth Library.
+
+* Maven group:artifact IDs: com.google.auth:google-auth-library-credentials
+* Maven group:artifact IDs: com.google.auth:google-auth-library-oauth2-http
+
+Project URL: https://github.com/googleapis/google-auth-library-java
+License: BSD 3-Clause
+| Copyright 2014, Google Inc. All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are
+| met:
+| 
+|    * Redistributions of source code must retain the above copyright
+| notice, this list of conditions and the following disclaimer.
+|    * Redistributions in binary form must reproduce the above
+| copyright notice, this list of conditions and the following disclaimer
+| in the documentation and/or other materials provided with the
+| distribution.
+| 
+|    * Neither the name of Google Inc. nor the names of its
+| contributors may be used to endorse or promote products derived from
+| this software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+| OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+| SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+| LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+| THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+| (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Google Auto Value annotations.
+
+* Maven group:artifact IDs: com.google.auto.value:auto-value-annotations
+
+Project URL: https://github.com/google/auto
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Google Cloud APIs for Java.
+
+* Maven group:artifact IDs: com.google.cloud:google-cloud-core
+* Maven group:artifact IDs: com.google.cloud:google-cloud-core-grpc
+* Maven group:artifact IDs: com.google.cloud:google-cloud-core-http
+* Maven group:artifact IDs: com.google.cloud:google-cloud-iamcredentials
+* Maven group:artifact IDs: com.google.cloud:google-cloud-monitoring
+* Maven group:artifact IDs: com.google.cloud:google-cloud-storage
+
+Project URL: https://github.com/googleapis/google-cloud-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles GCP OpenTelemetry.
+
+* Maven group:artifact IDs: com.google.cloud.opentelemetry:detector-resources-support
+* Maven group:artifact IDs: com.google.cloud.opentelemetry:exporter-metrics
+* Maven group:artifact IDs: com.google.cloud.opentelemetry:shared-resourcemapping
+
+Project URL: https://github.com/GoogleCloudPlatform/opentelemetry-operations-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles GSon.
+
+* Maven group:artifact IDs: com.google.code.gson:gson
+
+Project URL: https://github.com/google/gson
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Guava.
+
+* Maven group:artifact IDs: com.google.guava:failureaccess
+* Maven group:artifact IDs: com.google.guava:guava
+
+Project URL: https://github.com/google/guava
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Google Http Client.
+
+* Maven group:artifact IDs: com.google.http-client:google-http-client
+* Maven group:artifact IDs: com.google.http-client:google-http-client-apache-v2
+* Maven group:artifact IDs: com.google.http-client:google-http-client-appengine
+* Maven group:artifact IDs: com.google.http-client:google-http-client-gson
+* Maven group:artifact IDs: com.google.http-client:google-http-client-jackson2
+
+Project URL: https://github.com/googleapis/google-http-java-client
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Google j2objc.
+
+* Maven group:artifact IDs: com.google.j2objc:j2objc-annotations
+
+Project URL: https://github.com/google/j2objc/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Google OAuth Client.
+
+* Maven group:artifact IDs: com.google.oauth-client:google-oauth-client
+
+Project URL: https://github.com/googleapis/google-oauth-java-client
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Protobuf.
+
+* Maven group:artifact IDs: com.google.protobuf:protobuf-java
+* Maven group:artifact IDs: com.google.protobuf:protobuf-java-util
+
+Project URL: https://developers.google.com/protocol-buffers/
+License: BSD 3-Clause
+| Copyright 2008 Google Inc.  All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are
+| met:
+| 
+|     * Redistributions of source code must retain the above copyright
+| notice, this list of conditions and the following disclaimer.
+|     * Redistributions in binary form must reproduce the above
+| copyright notice, this list of conditions and the following disclaimer
+| in the documentation and/or other materials provided with the
+| distribution.
+|     * Neither the name of Google Inc. nor the names of its
+| contributors may be used to endorse or promote products derived from
+| this software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+| OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+| SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+| LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+| THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+| (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+| 
+| Code generated by the Protocol Buffer compiler is owned by the owner
+| of the input file used when generating it.  This code is not
+| standalone and requires a support library to be linked with it.  This
+| support library is itself covered by the above license.
+
+--------------------------------------------------------------------------------
+
+This product bundles Google re2j.
+
+* Maven group:artifact IDs: com.google.re2j:re2j
+
+Project URL: http://github.com/google/re2j
+License: Go License
+| This is a work derived from Russ Cox's RE2 in Go, whose license
+| http://golang.org/LICENSE is as follows:
+| 
+| Copyright (c) 2009 The Go Authors. All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are
+| met:
+| 
+|    * Redistributions of source code must retain the above copyright
+|      notice, this list of conditions and the following disclaimer.
+| 
+|    * Redistributions in binary form must reproduce the above copyright
+|      notice, this list of conditions and the following disclaimer in
+|      the documentation and/or other materials provided with the
+|      distribution.
+| 
+|    * Neither the name of Google Inc. nor the names of its contributors
+|      may be used to endorse or promote products derived from this
+|      software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+| OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+| SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+| LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+| DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+| THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+| (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Azure Microsoft Authentication Library for Java (msal4j).
+
+* Maven group:artifact IDs: com.microsoft.azure:msal4j
+* Maven group:artifact IDs: com.microsoft.azure:msal4j-persistence-extension
+
+Project URL: https://github.com/AzureAD/microsoft-authentication-library-for-java
+License: MIT License
+|     MIT License
+| 
+|     Copyright (c) Microsoft Corporation. All rights reserved.
+| 
+|     Permission is hereby granted, free of charge, to any person obtaining a copy
+|     of this software and associated documentation files (the "Software"), to deal
+|     in the Software without restriction, including without limitation the rights
+|     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+|     copies of the Software, and to permit persons to whom the Software is
+|     furnished to do so, subject to the following conditions:
+| 
+|     The above copyright notice and this permission notice shall be included in all
+|     copies or substantial portions of the Software.
+| 
+|     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+|     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+|     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+|     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+|     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+|     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+|     SOFTWARE
+
+--------------------------------------------------------------------------------
+
+This product bundles Nimbus Jose JWT.
+
+* Maven group:artifact IDs: com.nimbusds:nimbus-jose-jwt
+
+Project URL: https://bitbucket.org/connect2id/nimbus-jose-jwt
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons CLI.
+
+* Maven group:artifact IDs: commons-cli:commons-cli
+
+Project URL: https://commons.apache.org/proper/commons-cli/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons Codec.
+
+* Maven group:artifact IDs: commons-codec:commons-codec
+
+Project URL: https://commons.apache.org/proper/commons-codec/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons Collections.
+
+* Maven group:artifact IDs: org.apache.commons:commons-collections4
+
+Project URL: http://commons.apache.org/collections/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons IO.
+
+* Maven group:artifact IDs: commons-io:commons-io
+
+Project URL: https://commons.apache.org/proper/commons-io/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons Logging.
+
+* Maven group:artifact IDs: commons-logging:commons-logging
+
+Project URL: https://commons.apache.org/proper/commons-logging/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons Net.
+
+* Maven group:artifact IDs: commons-net:commons-net
+
+Project URL: https://commons.apache.org/proper/commons-net/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Failsafe.
+
+* Maven group:artifact IDs: dev.failsafe:failsafe
+
+Project URL: https://failsafe.dev
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles DNS Java.
+
+* Maven group:artifact IDs: dnsjava:dnsjava
+
+Project URL: https://github.com/dnsjava/dnsjava
+License: BSD 3-Clause
+| Copyright (c) 1998-2019, Brian Wellington
+| Copyright (c) 2005 VeriSign. All rights reserved.
+| Copyright (c) 2019-2023, dnsjava authors
+| 
+| All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are met:
+| 
+| 1. Redistributions of source code must retain the above copyright notice, this
+|    list of conditions and the following disclaimer.
+| 
+| 2. Redistributions in binary form must reproduce the above copyright notice,
+|    this list of conditions and the following disclaimer in the documentation
+|    and/or other materials provided with the distribution.
+| 
+| 3. Neither the name of the copyright holder nor the names of its
+|    contributors may be used to endorse or promote products derived from
+|    this software without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+| AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+| IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+| DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+| FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+| DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+| SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+| CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+| OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Agroal.
+
+* Maven group:artifact IDs: io.agroal:agroal-api
+* Maven group:artifact IDs: io.agroal:agroal-narayana
+* Maven group:artifact IDs: io.agroal:agroal-pool
+
+Project URL: https://agroal.github.io/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Airlift AirCompressor.
+
+* Maven group:artifact IDs: io.airlift:aircompressor
+
+Project URL: https://github.com/airlift/aircompressor
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles gRPC.
+
+* Maven group:artifact IDs: io.grpc:grpc-alts
+* Maven group:artifact IDs: io.grpc:grpc-api
+* Maven group:artifact IDs: io.grpc:grpc-auth
+* Maven group:artifact IDs: io.grpc:grpc-context
+* Maven group:artifact IDs: io.grpc:grpc-core
+* Maven group:artifact IDs: io.grpc:grpc-googleapis
+* Maven group:artifact IDs: io.grpc:grpc-grpclb
+* Maven group:artifact IDs: io.grpc:grpc-inprocess
+* Maven group:artifact IDs: io.grpc:grpc-netty
+* Maven group:artifact IDs: io.grpc:grpc-netty-shaded
+* Maven group:artifact IDs: io.grpc:grpc-opentelemetry
+* Maven group:artifact IDs: io.grpc:grpc-protobuf
+* Maven group:artifact IDs: io.grpc:grpc-protobuf-lite
+* Maven group:artifact IDs: io.grpc:grpc-rls
+* Maven group:artifact IDs: io.grpc:grpc-services
+* Maven group:artifact IDs: io.grpc:grpc-stub
+* Maven group:artifact IDs: io.grpc:grpc-util
+* Maven group:artifact IDs: io.grpc:grpc-xds
+
+Project URL: https://github.com/grpc/grpc-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Micrometer.
+
+* Maven group:artifact IDs: io.micrometer:micrometer-commons
+* Maven group:artifact IDs: io.micrometer:micrometer-core
+* Maven group:artifact IDs: io.micrometer:micrometer-observation
+* Maven group:artifact IDs: io.micrometer:micrometer-registry-prometheus-simpleclient
+
+Project URL: https://github.com/micrometer-metrics/micrometer
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles OpenCensus.
+
+* Maven group:artifact IDs: io.opencensus:opencensus-api
+* Maven group:artifact IDs: io.opencensus:opencensus-contrib-http-util
+
+Project URL: https://github.com/census-instrumentation/opencensus-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles OpenTelemetry Java Contrib.
+
+* Maven group:artifact IDs: io.opentelemetry.contrib:opentelemetry-gcp-resources
+* Maven group:artifact IDs: io.opentelemetry.contrib:opentelemetry-aws-xray-propagator
+
+Project URL: https://github.com/open-telemetry/opentelemetry-java-contrib
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles OpenTelemetry Java Instrumentation.
+
+* Maven group:artifact IDs: io.opentelemetry.instrumentation:opentelemetry-aws-sdk-2.2
+* Maven group:artifact IDs: io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations
+* Maven group:artifact IDs: io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations-support
+* Maven group:artifact IDs: io.opentelemetry.instrumentation:opentelemetry-instrumentation-api
+* Maven group:artifact IDs: io.opentelemetry.instrumentation:opentelemetry-instrumentation-api-incubator
+* Maven group:artifact IDs: io.opentelemetry.instrumentation:opentelemetry-jdbc
+* Maven group:artifact IDs: io.opentelemetry.instrumentation:opentelemetry-runtime-telemetry-java17
+* Maven group:artifact IDs: io.opentelemetry.instrumentation:opentelemetry-runtime-telemetry-java8
+
+Project URL: https://github.com/open-telemetry/opentelemetry-java-instrumentation
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles OpenTelemetry.
+
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-api
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-api-incubator
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-common
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-context
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-exporter-common
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-exporter-otlp
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-exporter-otlp-common
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-sdk
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-sdk-common
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-sdk-extension-autoconfigure
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-sdk-logs
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-sdk-metrics
+* Maven group:artifact IDs: io.opentelemetry:opentelemetry-sdk-trace
+
+Project URL: https://github.com/open-telemetry/opentelemetry-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles OpenTelemetry Semconv.
+
+* Maven group:artifact IDs: io.opentelemetry.semconv:opentelemetry-semconv
+* Maven group:artifact IDs: io.opentelemetry.semconv:opentelemetry-semconv-incubating
+
+Project URL: https://github.com/open-telemetry/semantic-conventions-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Perfmark.
+
+* Maven group:artifact IDs: io.perfmark:perfmark-api
+
+Project URL: https://github.com/perfmark/perfmark
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Reactor Netty.
+
+* Maven group:artifact IDs: io.projectreactor.netty:reactor-netty-core
+* Maven group:artifact IDs: io.projectreactor.netty:reactor-netty-http
+
+Project URL: https://github.com/reactor/reactor-netty
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Reactor Core.
+
+* Maven group:artifact IDs: io.projectreactor:reactor-core
+
+Project URL: https://github.com/reactor/reactor-core
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Prometheus SimpleClient.
+
+* Maven group:artifact IDs: io.prometheus:simpleclient
+* Maven group:artifact IDs: io.prometheus:simpleclient_common
+* Maven group:artifact IDs: io.prometheus:simpleclient_tracer_common
+* Maven group:artifact IDs: io.prometheus:simpleclient_tracer_otel
+* Maven group:artifact IDs: io.prometheus:simpleclient_tracer_otel_agent
+
+Project URL: http://github.com/prometheus/client_java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Swagger.
+
+* Maven group:artifact IDs: io.swagger:swagger-annotations
+* Maven group:artifact IDs: io.swagger:swagger-core
+* Maven group:artifact IDs: io.swagger:swagger-jaxrs
+* Maven group:artifact IDs: io.swagger:swagger-models
+
+Project URL: https://github.com/swagger-api/swagger-core
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles VertX.
+
+* Maven group:artifact IDs: io.vertx:vertx-auth-common
+* Maven group:artifact IDs: io.vertx:vertx-bridge-common
+* Maven group:artifact IDs: io.vertx:vertx-codegen
+* Maven group:artifact IDs: io.vertx:vertx-core
+* Maven group:artifact IDs: io.vertx:vertx-grpc
+* Maven group:artifact IDs: io.vertx:vertx-grpc-client
+* Maven group:artifact IDs: io.vertx:vertx-grpc-common
+* Maven group:artifact IDs: io.vertx:vertx-grpc-server
+* Maven group:artifact IDs: io.vertx:vertx-uri-template
+* Maven group:artifact IDs: io.vertx:vertx-web
+* Maven group:artifact IDs: io.vertx:vertx-web-client
+* Maven group:artifact IDs: io.vertx:vertx-web-common
+
+Project URL: https://vertx.io/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta Activation APi.
+
+* Maven group:artifact IDs: jakarta.activation:jakarta.activation-api
+
+Project URL: https://github.com/jakartaee/jaf-api
+License: EDL 1.0 - http://www.eclipse.org/org/documents/edl-v10.php
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta Annotation API.
+
+* Maven group:artifact IDs: jakarta.annotation:jakarta.annotation-api
+
+Project URL: https://projects.eclipse.org/projects/ee4j.ca
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta EL API.
+
+* Maven group:artifact IDs: jakarta.el:jakarta.el-api
+
+Project URL: https://projects.eclipse.org/projects/ee4j.el
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta CDI API.
+
+* Maven group:artifact IDs: jakarta.enterprise:jakarta.enterprise.cdi-api
+
+Project URL: http://cdi-spec.org
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta Enterprise lang-model.
+
+* Maven group:artifact IDs: jakarta.enterprise:jakarta.enterprise.lang-model
+
+Project URL: https://projects.eclipse.org/projects/ee4j
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta Inject API.
+
+* Maven group:artifact IDs: jakarta.inject:jakarta.inject-api
+
+Project URL: https://github.com/eclipse-ee4j/injection-api
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta Interceptor API.
+
+* Maven group:artifact IDs: jakarta.interceptor:jakarta.interceptor-api
+
+Project URL: https://github.com/jakartaee/interceptors
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta JSON API.
+
+* Maven group:artifact IDs: jakarta.json:jakarta.json-api
+
+Project URL: https://github.com/eclipse-ee4j/jsonp
+License: Eclipse Public License 2.0 - https://projects.eclipse.org/license/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta Resource API.
+
+* Maven group:artifact IDs: jakarta.resource:jakarta.resource-api
+
+Project URL: https://jakarta.ee/specifications/connectors/
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta Servlet API.
+
+* Maven group:artifact IDs: jakarta.servlet:jakarta.servlet-api
+
+Project URL: https://projects.eclipse.org/projects/ee4j.servlet
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta Transaction API.
+
+* Maven group:artifact IDs: jakarta.transaction:jakarta.transaction-api
+
+Project URL: https://projects.eclipse.org/projects/ee4j.jta
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta Validation API.
+
+* Maven group:artifact IDs: jakarta.validation:jakarta.validation-api
+
+Project URL: https://beanvalidation.org
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta RESTful Web Services.
+
+* Maven group:artifact IDs: jakarta.ws.rs:jakarta.ws.rs-api
+
+Project URL: https://github.com/eclipse-ee4j/jaxrs-api
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles Jakarta JAXB API.
+
+* Maven group:artifact IDs: jakarta.xml.bind:jakarta.xml.bind-api
+
+Project URL: https://github.com/jakartaee/jaxb-api
+License: Eclipse Distribution License 1.0 - http://www.eclipse.org/org/documents/edl-v10.php
+
+--------------------------------------------------------------------------------
+
+This product bundles JNA.
+
+* Maven group:artifact IDs: net.java.dev.jna:jna
+* Maven group:artifact IDs: net.java.dev.jna:jna-platform
+
+Project URL: https://github.com/java-native-access/jna
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Avro.
+
+* Maven group:artifact IDs: org.apache.avro:avro
+
+Project URL: https://avro.apache.org
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons Compress.
+
+* Maven group:artifact IDs: org.apache.commons:commons-compress
+
+Project URL: https://commons.apache.org/proper/commons-compress/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons Configuration.
+
+* Maven group:artifact IDs: org.apache.commons:commons-configuration2
+
+Project URL: https://commons.apache.org/proper/commons-configuration/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons Lang.
+
+* Maven group:artifact IDs: org.apache.commons:commons-lang3
+
+Project URL: https://commons.apache.org/proper/commons-lang/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons Math.
+
+* Maven group:artifact IDs: org.apache.commons:commons-math3
+
+Project URL: http://commons.apache.org/proper/commons-math/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Commons Text.
+
+* Maven group:artifact IDs: org.apache.commons:commons-text
+
+Project URL: https://commons.apache.org/proper/commons-text
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Curator.
+
+* Maven group:artifact IDs: org.apache.curator:curator-client
+* Maven group:artifact IDs: org.apache.curator:curator-framework
+* Maven group:artifact IDs: org.apache.curator:curator-recipes
+
+Project URL: http://curator.apache.org
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Hadoop.
+
+* Maven group:artifact IDs: org.apache.hadoop:hadoop-annotations
+* Maven group:artifact IDs: org.apache.hadoop:hadoop-auth
+* Maven group:artifact IDs: org.apache.hadoop:hadoop-client-api
+* Maven group:artifact IDs: org.apache.hadoop:hadoop-client-runtime
+* Maven group:artifact IDs: org.apache.hadoop:hadoop-common
+* Maven group:artifact IDs: org.apache.hadoop.thirdparty:hadoop-shaded-guava
+
+Project URL: https://hadoop.apache.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache HttpComponents (core and client).
+
+* Maven group:artifact IDs: org.apache.httpcomponents.client5:httpclient5
+* Maven group:artifact IDs: org.apache.httpcomponents.core5:httpcore5
+* Maven group:artifact IDs: org.apache.httpcomponents.core5:httpcore5-h2
+* Maven group:artifact IDs: org.apache.httpcomponents:httpclient
+* Maven group:artifact IDs: org.apache.httpcomponents:httpcore
+
+Project URL: https://hc.apache.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Kerby.
+
+* Maven group:artifact IDs: org.apache.kerby:kerb-core
+* Maven group:artifact IDs: org.apache.kerby:kerb-crypto
+* Maven group:artifact IDs: org.apache.kerby:kerb-util
+* Maven group:artifact IDs: org.apache.kerby:kerby-asn1
+* Maven group:artifact IDs: org.apache.kerby:kerby-config
+* Maven group:artifact IDs: org.apache.kerby:kerby-pkix
+* Maven group:artifact IDs: org.apache.kerby:kerby-util
+
+Project URL: https://directory.apache.org/kerby/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles jose4j.
+
+* Maven group:artifact IDs: org.bitbucket.b_c:jose4j
+
+Project URL: https://bitbucket.org/b_c/jose4j/src/master/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles bouncycastle.
+
+* Maven group:artifact IDs: org.bouncycastle:bcprov-jdk18on
+
+Project URL: https://www.bouncycastle.org/download/bouncy-castle-java/
+License: MIT License
+| Copyright (c) 2000 - 2024 The Legion of the Bouncy Castle Inc. (https://www.bouncycastle.org)
+| 
+| Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+| 
+| The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+| 
+| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+This product bundles checker-qual.
+
+* Maven group:artifact IDs: org.checkerframework:checker-qual
+
+Project URL: https://checkerframework.org/
+License: MIT License
+| The annotations are licensed under the MIT License.  (The text of this
+| license appears below.)  More specifically, all the parts of the Checker
+| Framework that you might want to include with your own program use the
+| MIT License.  This is the checker-qual.jar file and all the files that
+| appear in it:  every file in a qual/ directory, plus utility files such
+| as NullnessUtil.java, RegexUtil.java, SignednessUtil.java, etc.
+| In addition, the cleanroom implementations of third-party annotations,
+| which the Checker Framework recognizes as aliases for its own
+| annotations, are licensed under the MIT License.
+|
+| Permission is hereby granted, free of charge, to any person obtaining a copy
+| of this software and associated documentation files (the "Software"), to deal
+| in the Software without restriction, including without limitation the rights
+| to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+| copies of the Software, and to permit persons to whom the Software is
+| furnished to do so, subject to the following conditions:
+|
+| The above copyright notice and this permission notice shall be included in
+| all copies or substantial portions of the Software.
+|
+| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+| IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+| FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+| AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+| LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+| OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+| THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+This product bundles jettison.
+
+* Maven group:artifact IDs: org.codehaus.jettison:jettison
+
+Project URL: https://github.com/jettison-json/jettison
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles animal-sniffer-annotations.
+
+* Maven group:artifact IDs: org.codehaus.mojo:animal-sniffer-annotations
+
+Project URL: https://www.mojohaus.org/animal-sniffer
+License: MIT license
+| The MIT License
+| 
+| Copyright (c) 2009 codehaus.org.
+| 
+| Permission is hereby granted, free of charge, to any person obtaining a copy
+| of this software and associated documentation files (the "Software"), to deal
+| in the Software without restriction, including without limitation the rights
+| to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+| copies of the Software, and to permit persons to whom the Software is
+| furnished to do so, subject to the following conditions:
+| 
+| The above copyright notice and this permission notice shall be included in
+| all copies or substantial portions of the Software.
+| 
+| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+| IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+| FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+| AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+| LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+| OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+| THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+
+This product bundles stax2-api.
+
+* Maven group:artifact IDs: org.codehaus.woodstox:stax2-api
+
+Project URL: http://github.com/FasterXML/stax2-api
+License: BSD 2-Clause
+| BSD 2-Clause License
+| 
+| Copyright (c) 2008+, FasterXML, LLC
+| All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are met:
+| 
+| * Redistributions of source code must retain the above copyright notice, this
+|   list of conditions and the following disclaimer.
+| 
+| * Redistributions in binary form must reproduce the above copyright notice,
+|   this list of conditions and the following disclaimer in the documentation
+|   and/or other materials provided with the distribution.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+| AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+| IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+| DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+| FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+| DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+| SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+| CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+| OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+| OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Conscrypt (openjdk-uber).
+
+* Maven group:artifact IDs: org.conscrypt:conscrypt-openjdk-uber
+
+Project URL: https://conscrypt.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Microprofile.
+
+* Maven group:artifact IDs: org.eclipse.microprofile.config:microprofile-config-api
+* Maven group:artifact IDs: org.eclipse.microprofile.context-propagation:microprofile-context-propagation-api
+* Maven group:artifact IDs: org.eclipse.microprofile.fault-tolerance:microprofile-fault-tolerance-api
+* Maven group:artifact IDs: org.eclipse.microprofile.health:microprofile-health-api
+* Maven group:artifact IDs: org.eclipse.microprofile.jwt:microprofile-jwt-auth-api
+* Maven group:artifact IDs: org.eclipse.microprofile.reactive-streams-operators:microprofile-reactive-streams-operators-api
+* Maven group:artifact IDs: org.eclipse.microprofile.reactive-streams-operators:microprofile-reactive-streams-operators-core
+
+Project URL: http://microprofile.io
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Parsson.
+
+* Maven group:artifact IDs: org.eclipse.parsson:parsson
+* Maven group:artifact IDs: org.eclipse.parsson:jakarta.json
+
+Project URL: https://github.com/eclipse-ee4j/parsson
+License: Eclipse Public License 2.0 - https://projects.eclipse.org/license/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles expressly.
+
+* Maven group:artifact IDs: org.glassfish.expressly:expressly
+
+Project URL: https://projects.eclipse.org/projects/ee4j
+License: EPL 2.0 - https://www.eclipse.org/legal/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles HdrHistogram.
+
+* Maven group:artifact IDs: org.hdrhistogram:HdrHistogram
+
+Project URL: http://hdrhistogram.github.io/HdrHistogram/
+License: BSD 2-Clause
+| The code in this repository code was Written by Gil Tene, Michael Barker,
+| and Matt Warren, and released to the public domain, as explained at
+| http://creativecommons.org/publicdomain/zero/1.0/
+| 
+| For users of this code who wish to consume it under the "BSD" license
+| rather than under the public domain or CC0 contribution text mentioned
+| above, the code found under this directory is *also* provided under the
+| following license (commonly referred to as the BSD 2-Clause License). This
+| license does not detract from the above stated release of the code into
+| the public domain, and simply represents an additional license granted by
+| the Author.
+| 
+| -----------------------------------------------------------------------------
+| ** Beginning of "BSD 2-Clause License" text. **
+| 
+|  Copyright (c) 2012, 2013, 2014, 2015, 2016 Gil Tene
+|  Copyright (c) 2014 Michael Barker
+|  Copyright (c) 2014 Matt Warren
+|  All rights reserved.
+| 
+|  Redistribution and use in source and binary forms, with or without
+|  modification, are permitted provided that the following conditions are met:
+| 
+|  1. Redistributions of source code must retain the above copyright notice,
+|     this list of conditions and the following disclaimer.
+| 
+|  2. Redistributions in binary form must reproduce the above copyright notice,
+|     this list of conditions and the following disclaimer in the documentation
+|     and/or other materials provided with the distribution.
+| 
+|  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+|  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+|  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+|  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+|  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+|  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+|  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+|  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+|  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+|  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+|  THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Hibernate Validator.
+
+* Maven group:artifact IDs: org.hibernate.validator:hibernate-validator
+
+Project URL: http://hibernate.org/validator
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Javassist.
+
+* Maven group:artifact IDs: org.javassist:javassist
+
+Project URL: http://www.javassist.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles JBoss (logmanager, transaction, narayana).
+
+* Maven group:artifact IDs: org.jboss.invocation:jboss-invocation
+* Maven group:artifact IDs: org.jboss:jboss-transaction-spi
+* Maven group:artifact IDs: org.jboss.logging:commons-logging-jboss-logging
+* Maven group:artifact IDs: org.jboss.narayana.jta:narayana-jta
+* Maven group:artifact IDs: org.jboss.narayana.jts:narayana-jts-integration
+* Maven group:artifact IDs: org.jboss.slf4j:slf4j-jboss-logmanager
+* Maven group:artifact IDs: org.jboss.threads:jboss-threads
+* Maven group:artifact IDs: org.wildfly.common:wildfly-common
+
+Project URL: http://www.jboss.org
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles JCTools Core.
+
+* Maven group:artifact IDs: org.jctools:jctools-core
+
+Project URL: https://github.com/JCTools/JCTools
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles JSpecify.
+
+* Maven group:artifact IDs: org.jspecify:jspecify
+
+Project URL: http://jspecify.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles LatencyUtils.
+
+* Maven group:artifact IDs: org.latencyutils:LatencyUtils
+
+Project URL: http://latencyutils.github.io/LatencyUtils/
+License: BSD 2-Clause
+|   * This code was Written by Gil Tene of Azul Systems, and released to the
+|   * public domain, as explained at http://creativecommons.org/publicdomain/zero/1.0/
+| 
+|  For users of this code who wish to consume it under the "BSD" license
+|  rather than under the public domain or CC0 contribution text mentioned
+|  above, the code found under this directory is *also* provided under the
+|  following license (commonly referred to as the BSD 2-Clause License). This
+|  license does not detract from the above stated release of the code into
+|  the public domain, and simply represents an additional license granted by
+|  the Author.
+| 
+|  -----------------------------------------------------------------------------
+|  ** Beginning of "BSD 2-Clause License" text. **
+| 
+|   Copyright (c) 2012, 2013, 2014 Gil Tene
+|   All rights reserved.
+| 
+|   Redistribution and use in source and binary forms, with or without
+|   modification, are permitted provided that the following conditions are met:
+| 
+|   1. Redistributions of source code must retain the above copyright notice,
+|      this list of conditions and the following disclaimer.
+| 
+|   2. Redistributions in binary form must reproduce the above copyright notice,
+|      this list of conditions and the following disclaimer in the documentation
+|      and/or other materials provided with the distribution.
+| 
+|   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+|   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+|   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+|   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+|   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+|   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+|   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+|   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+|   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+|   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+|   THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Reactive Streams.
+
+* Maven group:artifact IDs: org.reactivestreams:reactive-streams
+
+Project URL: http://www.reactive-streams.org/
+License: MIT License
+| MIT No Attribution
+| 
+| Copyright 2014 Reactive Streams
+| 
+| Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.
+| 
+| THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Reflections.
+
+* Maven group:artifact IDs: org.reflections:reflections
+
+Project URL: http://github.com/ronmamo/reflections
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles RoaringBitmap.
+
+* Maven group:artifact IDs: org.roaringbitmap:RoaringBitmap
+
+Project URL: https://github.com/RoaringBitmap/RoaringBitmap
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles SLF4J.
+
+* Maven group:artifact IDs: org.slf4j:slf4j-api
+
+Project URL: http://www.slf4j.org
+License: MIT License
+| Copyright (c) 2004-2022 QOS.ch Sarl (Switzerland)
+| All rights reserved.
+| 
+| Permission is hereby granted, free  of charge, to any person obtaining
+| a  copy  of this  software  and  associated  documentation files  (the
+| "Software"), to  deal in  the Software without  restriction, including
+| without limitation  the rights to  use, copy, modify,  merge, publish,
+| distribute,  sublicense, and/or sell  copies of  the Software,  and to
+| permit persons to whom the Software  is furnished to do so, subject to
+| the following conditions:
+| 
+| The  above  copyright  notice  and  this permission  notice  shall  be
+| included in all copies or substantial portions of the Software.
+| 
+| THE  SOFTWARE IS  PROVIDED  "AS  IS", WITHOUT  WARRANTY  OF ANY  KIND,
+| EXPRESS OR  IMPLIED, INCLUDING  BUT NOT LIMITED  TO THE  WARRANTIES OF
+| MERCHANTABILITY,    FITNESS    FOR    A   PARTICULAR    PURPOSE    AND
+| NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+| LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+| OF CONTRACT, TORT OR OTHERWISE,  ARISING FROM, OUT OF OR IN CONNECTION
+| WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+This product bundles ThreetenBP.
+
+* Maven group:artifact IDs: org.threeten:threetenbp
+
+Project URL: https://www.threeten.org/threetenbp
+License: BSD 3-Clause
+| Copyright (c) 2007-present, Stephen Colebourne & Michael Nascimento Santos.
+| 
+| All rights reserved.
+| 
+| Redistribution and use in source and binary forms, with or without
+| modification, are permitted provided that the following conditions are met:
+| 
+| * Redistributions of source code must retain the above copyright notice,
+|   this list of conditions and the following disclaimer.
+| 
+| * Redistributions in binary form must reproduce the above copyright notice,
+|   this list of conditions and the following disclaimer in the documentation
+|   and/or other materials provided with the distribution.
+| 
+| * Neither the name of JSR-310 nor the names of its contributors
+|   may be used to endorse or promote products derived from this software
+|   without specific prior written permission.
+| 
+| THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+| "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+| LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+| A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+| CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+| EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+| PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+| PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+| LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+| NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+| SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+
+This product bundles Snappy Java.
+
+* Maven group:artifact IDs: org.xerial.snappy:snappy-java
+
+Project URL: https://github.com/xerial/snappy-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles SnakeYAML.
+
+* Maven group:artifact IDs: org.yaml:snakeyaml
+
+Project URL: https://bitbucket.org/snakeyaml/snakeyaml
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles AWS SDK for Java.
+
+* Maven group:artifact IDs: software.amazon.awssdk:annotations
+* Maven group:artifact IDs: software.amazon.awssdk:apache-client
+* Maven group:artifact IDs: software.amazon.awssdk:arns
+* Maven group:artifact IDs: software.amazon.awssdk:auth
+* Maven group:artifact IDs: software.amazon.awssdk:aws-core
+* Maven group:artifact IDs: software.amazon.awssdk:aws-json-protocol
+* Maven group:artifact IDs: software.amazon.awssdk:aws-query-protocol
+* Maven group:artifact IDs: software.amazon.awssdk:aws-xml-protocol
+* Maven group:artifact IDs: software.amazon.awssdk:checksums
+* Maven group:artifact IDs: software.amazon.awssdk:checksums-spi
+* Maven group:artifact IDs: software.amazon.awssdk:cloudwatchlogs
+* Maven group:artifact IDs: software.amazon.awssdk:crt-core
+* Maven group:artifact IDs: software.amazon.awssdk:endpoints-spi
+* Maven group:artifact IDs: software.amazon.awssdk:http-auth
+* Maven group:artifact IDs: software.amazon.awssdk:http-auth-aws
+* Maven group:artifact IDs: software.amazon.awssdk:http-auth-aws-eventstream
+* Maven group:artifact IDs: software.amazon.awssdk:http-auth-spi
+* Maven group:artifact IDs: software.amazon.awssdk:http-client-spi
+* Maven group:artifact IDs: software.amazon.awssdk:iam-policy-builder
+* Maven group:artifact IDs: software.amazon.awssdk:identity-spi
+* Maven group:artifact IDs: software.amazon.awssdk:json-utils
+* Maven group:artifact IDs: software.amazon.awssdk:kms
+* Maven group:artifact IDs: software.amazon.awssdk:metrics-spi
+* Maven group:artifact IDs: software.amazon.awssdk:netty-nio-client
+* Maven group:artifact IDs: software.amazon.awssdk:profiles
+* Maven group:artifact IDs: software.amazon.awssdk:protocol-core
+* Maven group:artifact IDs: software.amazon.awssdk:rds
+* Maven group:artifact IDs: software.amazon.awssdk:regions
+* Maven group:artifact IDs: software.amazon.awssdk:retries
+* Maven group:artifact IDs: software.amazon.awssdk:retries-spi
+* Maven group:artifact IDs: software.amazon.awssdk:s3
+* Maven group:artifact IDs: software.amazon.awssdk:sdk-core
+* Maven group:artifact IDs: software.amazon.awssdk:sts
+* Maven group:artifact IDs: software.amazon.awssdk:third-party-jackson-core
+* Maven group:artifact IDs: software.amazon.awssdk:utils
+* Maven group:artifact IDs: software.amazon.awssdk:utils-lite
+
+Project URL: https://aws.amazon.com/sdkforjava
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles AWS EventStream Java.
+
+* Maven group:artifact IDs: software.amazon.eventstream:eventstream
+
+Project URL: https://github.com/awslabs/aws-eventstream-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Projectnessie CEL.
+
+* Maven group:artifact IDs: org.projectnessie.cel:cel-standalone
+
+Project URL: https://github.com/projectnessie/cel-java
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Agrona.
+
+* Maven group:artifact IDs: org.agrona:agrona
+
+Project URL: https://github.com/aeron-io/agrona
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Ranger libraries.
+
+* Maven group:artifact IDs: org.apache.ranger:authz-embedded
+* Maven group:artifact IDs: org.apache.ranger:ranger-audit-core
+* Maven group:artifact IDs: org.apache.ranger:ranger-audit-dest-solr
+* Maven group:artifact IDs: org.apache.ranger:ranger-authz-api
+* Maven group:artifact IDs: org.apache.ranger:ranger-plugin-classloader
+* Maven group:artifact IDs: org.apache.ranger:ranger-plugins-common
+* Maven group:artifact IDs: org.apache.ranger:ranger-plugins-cred
+* Maven group:artifact IDs: org.apache.ranger:ugsync-util
+
+Project URL: https://github.com/apache/ranger
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Jetty libraries.
+
+* Maven group:artifact IDs: org.eclipse.jetty:jetty-client
+* Maven group:artifact IDs: org.eclipse.jetty:jetty-http
+* Maven group:artifact IDs: org.eclipse.jetty:jetty-io
+* Maven group:artifact IDs: org.eclipse.jetty:jetty-util
+
+Home page: https://github.com/jetty/jetty.project/
+License: Eclipse Public License 2.0 - https://projects.eclipse.org/license/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles FasterXML libraries.
+
+* Maven group:artifact IDs: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base
+* Maven group:artifact IDs: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider
+* Maven group:artifact IDs: com.fasterxml.jackson.module:jackson-module-jaxb-annotations
+
+Home page: https://github.com/FasterXML/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles HttpComponents libraries.
+
+* Maven group:artifact IDs: org.apache.httpcomponents:httpasyncclient
+* Maven group:artifact IDs: org.apache.httpcomponents:httpcore-nio
+* Maven group:artifact IDs: org.apache.httpcomponents:httpmime
+
+Home page: https://hc.apache.org/
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles JSON Smart libraries.
+
+* Maven group:artifact IDs: net.minidev:json-smart
+* Maven group:artifact IDs: net.minidev:accessors-smart
+
+Home page: https://github.com/netplex/json-smart-v2
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Zookeeper libraries.
+
+* Maven group:artifact IDs: org.apache.zookeeper:zookeeper
+* Maven group:artifact IDs: org.apache.zookeeper:zookeeper-jute
+
+Home page: https://github.com/apache/zookeeper
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Commons Collections library.
+
+* Maven group:artifact IDs: commons-collections:commons-collections
+
+Home page: https://github.com/apache/commons-collections
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Commons Lang library.
+
+* Maven group:artifact IDs: commons-lang:commons-lang
+
+Home page: https://github.com/apache/commons-lang
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles High Performance Primitive Collections library.
+
+* Maven group:artifact IDs: com.carrotsearch:hppc
+
+Home page: https://github.com/carrotsearch/hppc
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Joda Time library.
+
+* Maven group:artifact IDs: joda-time:joda-time
+
+Home page: https://github.com/JodaOrg/joda-time
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Solr library.
+
+* Maven group:artifact IDs: org.apache.solr:solr-solrj
+
+Home page: https://github.com/apache/solr
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Apache Yetus library.
+
+* Maven group:artifact IDs: org.apache.yetus:audience-annotations
+
+Home page: https://github.com/apache/yetus
+License: Apache License 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles ASM library.
+
+* Maven group:artifact IDs: org.ow2.asm:asm
+
+Home page: https://gitlab.ow2.org/asm/asm
+License: BSD 3-Clause - https://gitlab.ow2.org/asm/asm/-/blob/master/LICENSE.txt
+
+--------------------------------------------------------------------------------
+
+This product bundles Gethostname4j library.
+
+* Maven group:artifact IDs: com.kstruct:gethostname4j
+
+Home page: https://github.com/mattsheppard/gethostname4j
+License: MIT License - https://mit-license.org/
+
+--------------------------------------------------------------------------------
+
+This product bundles Jersey Bundle library.
+
+* Maven group:artifact IDs: com.sun.jersey:jersey-bundle
+
+Home page: https://github.com/eclipse-ee4j/jersey
+License: Eclipse Public License 2.0 - https://projects.eclipse.org/license/epl-2.0
+
+--------------------------------------------------------------------------------
+
+This product bundles JAXB API library.
+
+* Maven group:artifact IDs: javax.xml.bind:jaxb-api
+
+Home page: https://javaee.github.io/jaxb-v2/
+License: CDDL - https://javaee.github.io/jaxb-v2/LICENSE
+
+--------------------------------------------------------------------------------
+
+This product bundles GraalVM libraries.
+
+* Maven group:artifact IDs: org.graalvm.js:js
+* Maven group:artifact IDs: org.graalvm.js:js-language
+* Maven group:artifact IDs: org.graalvm.js:js-scriptengine
+* Maven group:artifact IDs: org.graalvm.polyglot:js
+* Maven group:artifact IDs: org.graalvm.polyglot:polyglot
+* Maven group:artifact IDs: org.graalvm.regex:regex
+* Maven group:artifact IDs: org.graalvm.sdk:collections
+* Maven group:artifact IDs: org.graalvm.sdk:jniutils
+* Maven group:artifact IDs: org.graalvm.sdk:nativeimage
+* Maven group:artifact IDs: org.graalvm.sdk:word
+* Maven group:artifact IDs: org.graalvm.shadowed:icu4j
+* Maven group:artifact IDs: org.graalvm.shadowed:xz
+* Maven group:artifact IDs: org.graalvm.truffle:truffle-api
+* Maven group:artifact IDs: org.graalvm.truffle:truffle-compiler
+* Maven group:artifact IDs: org.graalvm.truffle:truffle-runtime
+
+Home page: https://github.com/oracle/graal/
+License: The GNU General Public License (GPL) - https://github.com/oracle/graal/blob/master/LICENSE
+
+--------------------------------------------------------------------------------

@@ -1,0 +1,601 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+name: Release - 3 - Build and Publish Release Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode (check to enable, uncheck to perform actual operations)'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  prerequisite-checks:
+    name: Prerequisite Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      dry_run: ${{ steps.set-outputs.outputs.dry_run }}
+      git_tag: ${{ steps.validate-tag.outputs.git_tag }}
+      version_without_rc: ${{ steps.validate-tag.outputs.version_without_rc }}
+      rc_number: ${{ steps.validate-tag.outputs.rc_number }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-env
+
+      - name: Set up environment variables
+        id: set-outputs
+        env:
+          DRY_RUN_INPUT: ${{ github.event.inputs.dry_run }}
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+          echo "## Mode" >> $GITHUB_STEP_SUMMARY
+          if [[ "${DRY_RUN_INPUT}" == "true" ]]; then
+            echo "DRY_RUN=1" >> $GITHUB_ENV
+            echo "dry_run=1" >> $GITHUB_OUTPUT
+            echo "‼️ DRY_RUN mode enabled - No actual changes will be made" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "DRY_RUN=0" >> $GITHUB_ENV
+            echo "dry_run=0" >> $GITHUB_OUTPUT
+            echo "DRY_RUN mode disabled - Performing actual operations" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Validate release candidate tag
+        id: validate-tag
+        env:
+          GIT_REF: ${{ github.ref }}
+        run: |
+          source "${LIBS_DIR}/_version.sh"
+
+          echo "## Parameters" >> $GITHUB_STEP_SUMMARY
+
+          # Extract the ref name from github.ref
+          # github.ref format: refs/heads/branch-name or refs/tags/tag-name
+          ref="${GIT_REF}"
+
+          if [[ "${ref}" =~ ^refs/tags/(.+)$ ]]; then
+            # Running from a tag
+            git_tag="${BASH_REMATCH[1]}"
+          else
+            echo "❌ Workflow must be run from a release candidate tag, not a branch." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Current ref: \`${ref}\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please select a release candidate tag (e.g., \`apache-polaris-1.0.0-rc0\`) from the 'Use workflow from' dropdown in the GitHub UI." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          # Validate git tag format and extract version components
+          if ! validate_and_extract_git_tag_version "${git_tag}"; then
+            echo "❌ Invalid git tag format: \`${git_tag}\`. Expected format: apache-polaris-x.y.z-rcN." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          # Export variables for next steps and job outputs
+          echo "git_tag=${git_tag}" >> $GITHUB_ENV
+          echo "version_without_rc=${version_without_rc}" >> $GITHUB_ENV
+          echo "rc_number=${rc_number}" >> $GITHUB_ENV
+
+          echo "git_tag=${git_tag}" >> $GITHUB_OUTPUT
+          echo "version_without_rc=${version_without_rc}" >> $GITHUB_OUTPUT
+          echo "rc_number=${rc_number}" >> $GITHUB_OUTPUT
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          | Parameter | Value |
+          | --- | --- |
+          | Git tag | \`${git_tag}\` |
+          | Version | \`${version_without_rc}\` |
+          | RC number | \`${rc_number}\` |
+          EOT
+
+  build-and-publish-artifacts:
+    name: Build and Publish Release Artifacts
+    runs-on: ubuntu-latest
+    needs: prerequisite-checks
+    permissions:
+      contents: read
+    outputs:
+      staging_repository_id: ${{ steps.publish-nexus.outputs.staging_repository_id }}
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-env
+
+      - name: Set up environment variables
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+      - name: Set up Java
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install Subversion
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
+        with:
+          gpg_private_key: ${{ secrets.POLARIS_GPG_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Build source and binary distributions
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          exec_process ./gradlew assemble sourceTarball -Prelease -PuseGpgAgent
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Build
+          Source and binary distributions built successfully
+          EOT
+
+      - name: Stage artifacts to Apache dist dev repository
+        env:
+          SVN_USERNAME: ${{ secrets.POLARIS_SVN_DEV_USERNAME }} # zizmor: ignore[secrets-outside-env]
+          SVN_PASSWORD: ${{ secrets.POLARIS_SVN_DEV_PASSWORD }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+
+          source "${LIBS_DIR}/_constants.sh"
+          source "${LIBS_DIR}/_exec.sh"
+
+          dist_dev_dir=${RELEASEY_DIR}/polaris-dist-dev
+
+          # Retry logic for SVN checkout (Apache SVN can have transient connectivity issues)
+          exec_process_with_retries 5 60 "${dist_dev_dir}" svn checkout --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive "${APACHE_DIST_URL}${APACHE_DIST_PATH}" "${dist_dev_dir}"
+
+          version_dir="${dist_dev_dir}/${version_without_rc}"
+
+          # If the version directory already exists in SVN (e.g. re-running the workflow),
+          # delete it so we can re-add fresh artifacts without "already versioned" errors.
+          if svn info "${version_dir}" &>/dev/null 2>&1; then
+            exec_process svn delete "${version_dir}"
+          fi
+
+          exec_process mkdir -p "${version_dir}"
+          exec_process cp build/distributions/* "${version_dir}/"
+          exec_process cp runtime/distribution/build/distributions/* "${version_dir}/"
+
+          exec_process cd "${dist_dev_dir}"
+          exec_process svn add "${version_without_rc}"
+
+          exec_process svn commit --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive -m "Stage Apache Polaris ${version_without_rc} RC${rc_number}"
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Staging to dist dev
+          Artifacts staged to Apache dist dev repository
+          EOT
+
+      - name: Publish and close Apache Nexus staging repository
+        id: publish-nexus
+        env:
+          ORG_GRADLE_PROJECT_apacheUsername: ${{ secrets.NEXUS_STAGE_DEPLOYER_USER }} # zizmor: ignore[secrets-outside-env]
+          ORG_GRADLE_PROJECT_apachePassword: ${{ secrets.NEXUS_STAGE_DEPLOYER_PW }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Publish artifacts to staging repository
+          exec_process ./gradlew publishToApache closeApacheStagingRepository -Prelease -PuseGpgAgent --info 2>&1 | tee gradle_publish_output.txt ; test ${PIPESTATUS[0]} -eq 0
+
+          # Extract staging repository ID from Gradle output
+          if grep -q "Created staging repository" gradle_publish_output.txt; then
+            staging_repository_id=$(grep "Created staging repository" gradle_publish_output.txt | sed --regexp-extended "s/^Created staging repository .([a-z0-9-]+). at (.*)/\1/")
+          else
+            staging_repository_id="<NOT EXTRACTED, CHECK LOG>"
+          fi
+
+          # Set output for other jobs to consume
+          echo "staging_repository_id=${staging_repository_id}" >> $GITHUB_OUTPUT
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          ## Nexus Staging Repository
+          Artifacts published and staging repository closed successfully
+
+          | Property | Value |
+          | --- | --- |
+          | Staging Repository ID | \`${staging_repository_id}\` |
+
+          ## Summary
+          🎉 Artifacts built and published successfully:
+
+          | Operation | Status |
+          | --- | --- |
+          | Build source and binary distributions | ✅ |
+          | Stage artifacts to Apache dist dev repository | ✅ |
+          | Stage artifacts to Apache Nexus staging repository | ✅ |
+          | Close Nexus staging repository | ✅ |
+          EOT
+
+  build-docker:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [prerequisite-checks, build-and-publish-artifacts]
+    permissions:
+      contents: read
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-env
+
+      - name: Set up environment variables
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx use default
+          docker buildx create \
+          --platform linux/amd64,linux/arm64 \
+          --use \
+          --name polarisbuild \
+          --driver-opt network=host || docker buildx use polarisbuild
+          docker buildx inspect
+
+      - name: Set up Java
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build Polaris Server Docker image
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          exec_process ./gradlew :polaris-server:assemble :polaris-server:quarkusAppPartsBuild --rerun \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.container-image.push=false \
+            -Dquarkus.docker.buildx.platform="linux/amd64,linux/arm64" \
+            -Dquarkus.container-image.tag="${version_without_rc}"
+
+      - name: Build Polaris Admin Tool Docker image
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          exec_process ./gradlew :polaris-admin:assemble :polaris-admin:quarkusAppPartsBuild --rerun \
+            -Dquarkus.container-image.build=true \
+            -Dquarkus.container-image.push=false \
+            -Dquarkus.docker.buildx.platform="linux/amd64,linux/arm64" \
+            -Dquarkus.container-image.tag="${version_without_rc}"
+
+          echo "## Docker Images Summary" >> $GITHUB_STEP_SUMMARY
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          🎉 Docker images built successfully:
+
+          | Component | Status |
+          | --- | --- |
+          | Polaris Server Docker image | ✅ Built |
+          | Polaris Admin Tool Docker image | ✅ Built |
+          EOT
+
+  build-and-stage-helm-chart:
+    name: Build and Stage Helm Chart
+    runs-on: ubuntu-latest
+    needs: [prerequisite-checks, build-docker]
+    permissions:
+      contents: read
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-env
+
+      - name: Set up environment variables
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+      - name: Set up Helm
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 # v5.0.0
+        with:
+          version: 'latest'
+
+      - name: Install Subversion
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7.0.0
+        with:
+          gpg_private_key: ${{ secrets.POLARIS_GPG_PRIVATE_KEY }} # zizmor: ignore[secrets-outside-env]
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Create Helm package
+        run: |
+          source "${LIBS_DIR}/_exec.sh"
+
+          # Make sure these files are always deleted
+          trap "rm -f /tmp/secring.gpg /tmp/pubring.gpg" EXIT
+
+          gpg --batch --pinentry-mode loopback --export-secret-keys > /tmp/secring.gpg
+          gpg --batch --pinentry-mode loopback --export > /tmp/pubring.gpg
+
+          exec_process cd helm
+          # Prerequisite for reproducible helm packages: file modification time must be deterministic
+          # Works with helm since version 4.0.0
+          exec_process find polaris -exec touch -d "1980-01-01 00:00:00" {} +
+          exec_process helm package polaris --sign --key "." --keyring /tmp/secring.gpg
+          exec_process helm verify polaris-${version_without_rc}.tgz --keyring /tmp/pubring.gpg
+
+          calculate_sha512 polaris-${version_without_rc}.tgz
+          exec_process gpg --armor --output polaris-${version_without_rc}.tgz.asc --detach-sig polaris-${version_without_rc}.tgz
+          calculate_sha512 polaris-${version_without_rc}.tgz.prov
+          exec_process gpg --armor --output polaris-${version_without_rc}.tgz.prov.asc --detach-sig polaris-${version_without_rc}.tgz.prov
+
+      - name: Stage Helm chart to Apache dist dev repository
+        env:
+          SVN_USERNAME: ${{ secrets.POLARIS_SVN_DEV_USERNAME }} # zizmor: ignore[secrets-outside-env]
+          SVN_PASSWORD: ${{ secrets.POLARIS_SVN_DEV_PASSWORD }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+
+          source "${LIBS_DIR}/_constants.sh"
+          source "${LIBS_DIR}/_exec.sh"
+
+          dist_dev_dir=${RELEASEY_DIR}/polaris-dist-dev
+
+          # Retry logic for SVN checkout (Apache SVN can have transient connectivity issues)
+          exec_process_with_retries 5 60 "${dist_dev_dir}" svn checkout --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive "${APACHE_DIST_URL}${APACHE_DIST_PATH}" "${dist_dev_dir}"
+
+          helm_version_dir="${dist_dev_dir}/helm-chart/${version_without_rc}"
+
+          # If the helm version directory already exists in SVN (e.g. re-running the workflow),
+          # delete it so we can re-add fresh artifacts without "already versioned" errors.
+          if svn info "${helm_version_dir}" &>/dev/null 2>&1; then
+            exec_process svn delete "${helm_version_dir}"
+          fi
+
+          exec_process mkdir -p "${helm_version_dir}"
+          exec_process cp helm/polaris-${version_without_rc}.tgz* "${helm_version_dir}/"
+
+          exec_process cd "${dist_dev_dir}"
+          exec_process svn add --parents "helm-chart/${version_without_rc}"
+
+          exec_process svn commit --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive -m "Stage Apache Polaris Helm chart ${version_without_rc} RC${rc_number}"
+
+          echo "## Helm Chart Summary" >> $GITHUB_STEP_SUMMARY
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          🎉 Helm chart staged successfully:
+
+          | Component | Status |
+          | --- | --- |
+          | Helm package | ✅ Created and signed |
+          | Apache dist dev repository | ✅ Staged |
+          EOT
+
+      - name: Regenerate Helm index with archive versions
+        env:
+          SVN_USERNAME: ${{ secrets.POLARIS_SVN_DEV_USERNAME }} # zizmor: ignore[secrets-outside-env]
+          SVN_PASSWORD: ${{ secrets.POLARIS_SVN_DEV_PASSWORD }} # zizmor: ignore[secrets-outside-env]
+        run: |
+          echo "::add-mask::$SVN_PASSWORD"
+
+          source "${LIBS_DIR}/_exec.sh"
+
+          dist_dev_dir=${RELEASEY_DIR}/polaris-dist-dev
+
+          # Base URL for Apache Polaris helm charts archive
+          ARCHIVE_URL="https://archive.apache.org/dist/polaris/helm-chart"
+
+          # Temporary directory for downloads
+          WORK_DIR=$(mktemp -d)
+          trap 'rm -rf "$WORK_DIR"' EXIT
+
+          echo "Working directory: $WORK_DIR"
+
+          echo ""
+          echo "Discovering chart versions from archive.apache.org..."
+          ARCHIVE_VERSIONS=$(curl -sL "$ARCHIVE_URL/" | \
+            grep -oE 'href="[0-9]+\.[0-9]+\.[0-9]+(-incubating)?/"' | \
+            sed 's/href="//;s/\/"//' | \
+            sort -V | uniq || echo "")
+          echo "Found archive versions: $ARCHIVE_VERSIONS"
+
+          echo ""
+          echo "Downloading archived Helm charts..."
+          for version in $ARCHIVE_VERSIONS; do
+            echo "Processing archive version: $version"
+
+            CHART_URL="${ARCHIVE_URL}/${version}/polaris-${version}.tgz"
+            LOCAL_TGZ="$WORK_DIR/polaris-${version}.tgz"
+
+            echo "  Downloading: $CHART_URL"
+            if ! curl -sLf -o "$LOCAL_TGZ" "$CHART_URL"; then
+              echo "  WARNING: Failed to download $CHART_URL, skipping..."
+              continue
+            fi
+            echo "  Done."
+          done
+
+          echo ""
+          echo "Adding current release candidate: ${version_without_rc}"
+          exec_process cp "${dist_dev_dir}/helm-chart/${version_without_rc}/polaris-${version_without_rc}.tgz" "$WORK_DIR/"
+
+          echo ""
+          echo "Generating index.yaml with helm repo index..."
+          exec_process helm repo index "$WORK_DIR"
+
+          # Post-process the index.yaml to use appropriate URLs
+          echo ""
+          echo "Updating URLs in index.yaml..."
+
+          # Replace archived versions with absolute URLs to archive.apache.org
+          for version in $ARCHIVE_VERSIONS; do
+            sed -i.bak "s|^\( *- \)polaris-${version}.tgz$|\1${ARCHIVE_URL}/${version}/polaris-${version}.tgz|" "$WORK_DIR/index.yaml"
+          done
+
+          # Replace current RC version with relative URL
+          sed -i.bak "s|^\( *- \)polaris-${version_without_rc}.tgz$|\1${version_without_rc}/polaris-${version_without_rc}.tgz|" "$WORK_DIR/index.yaml"
+
+          # Copy the updated index.yaml to the dist dev directory
+          exec_process cp "$WORK_DIR/index.yaml" "${dist_dev_dir}/helm-chart/index.yaml"
+
+          # Copy the artifacthub-repo.yml to the dist dev directory
+          exec_process cp "helm/polaris/artifacthub-repo.yml" "${dist_dev_dir}/helm-chart/artifacthub-repo.yml"
+
+          exec_process cd "${dist_dev_dir}"
+          # Add index.yaml and artifacthub-repo.yml if not already versioned
+          # (they are removed from dist dev by workflow 4 after each release)
+          exec_process svn add helm-chart/index.yaml || true
+          exec_process svn add helm-chart/artifacthub-repo.yml || true
+          # Commit the updated index and artifacthub-repo.yml
+          exec_process svn commit --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive -m "Update Helm index and artifacthub-repo.yml for ${version_without_rc} RC${rc_number}"
+
+          echo "## Helm Index Summary" >> $GITHUB_STEP_SUMMARY
+          ARCHIVE_COUNT=$(echo "$ARCHIVE_VERSIONS" | grep -v '^$' | wc -w | tr -d ' ')
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          🎉 Helm index regenerated successfully:
+
+          | Component | Status |
+          | --- | --- |
+          | Charts from archive.apache.org | ✅ ${ARCHIVE_COUNT} versions indexed |
+          | Current RC | ✅ ${version_without_rc} added with relative URL |
+          | Helm index | ✅ Committed to dist dev |
+          | Artifact Hub metadata | ✅ Committed to dist dev |
+          EOT
+
+  generate-release-email:
+    name: Generate Release Email Body
+    runs-on: ubuntu-latest
+    needs: [prerequisite-checks, build-and-publish-artifacts, build-docker, build-and-stage-helm-chart]
+    permissions:
+      contents: read
+    env:
+      DRY_RUN: ${{ needs.prerequisite-checks.outputs.dry_run }}
+      git_tag: ${{ needs.prerequisite-checks.outputs.git_tag }}
+      version_without_rc: ${{ needs.prerequisite-checks.outputs.version_without_rc }}
+      rc_number: ${{ needs.prerequisite-checks.outputs.rc_number }}
+      staging_repository_id: ${{ needs.build-and-publish-artifacts.outputs.staging_repository_id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-env
+
+      - name: Set up environment variables
+        run: |
+          echo "RELEASEY_DIR=$(pwd)/releasey" >> $GITHUB_ENV
+          echo "LIBS_DIR=$(pwd)/releasey/libs" >> $GITHUB_ENV
+
+      - name: Generate release email body
+        run: |
+          source "${LIBS_DIR}/_version.sh"
+
+          # Get current commit SHA
+          commit_sha=$(git rev-parse HEAD)
+
+          cat <<EOT >> $GITHUB_STEP_SUMMARY
+          # Vote e-mail
+
+          ## Subject
+          [VOTE] Release Apache Polaris ${version_without_rc} (rc${rc_number})
+
+          ## Body
+          Hi everyone,
+
+          I propose that we release the following RC as the official Apache Polaris ${version_without_rc} release.
+
+          This corresponds to the tag: ${git_tag}
+          * https://github.com/apache/polaris/commits/${git_tag}
+          * https://github.com/apache/polaris/tree/${commit_sha}
+
+          The release tarball, signature, and checksums are here:
+          * https://dist.apache.org/repos/dist/dev/polaris/${version_without_rc}
+
+          Helm charts are available on:
+          * https://dist.apache.org/repos/dist/dev/polaris/helm-chart/${version_without_rc}
+
+          NB: you have to build the Docker images locally in order to test Helm charts.
+
+          You can find the KEYS file here:
+          * https://downloads.apache.org/polaris/KEYS
+
+          Convenience binary artifacts are staged on Nexus. The Maven repository URL is:
+          * https://repository.apache.org/content/repositories/${staging_repository_id}/
+
+          Please download, verify, and test according to the release verification guide, which can be found at:
+          * https://polaris.apache.org/community/release-guides/release-verification-guide/
+
+          Please vote in the next 72 hours.
+
+          [ ] +1 Release this as Apache Polaris ${version_without_rc}
+          [ ] +0
+          [ ] -1 Do not release this because...
+
+          Only PMC members have binding votes, but other community members are encouraged to cast non-binding votes.
+          This vote will pass if there are 3 binding +1 votes and more binding +1 votes than -1 votes.
+          EOT

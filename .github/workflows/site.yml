@@ -1,0 +1,86 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+# Site publishing workflow, not for pull-request CI
+
+name: "Hugo Site"
+on:
+  push:
+    branches: [ "main" ]
+  workflow_call:
+    # The workflow is programmatically "protected" to be only callable from the 'apache/polaris' repo.
+    # Beware: this workflow will be called with the `github` context from the 'versioned-docs' branch,
+    # which means, for example, that the `github.ref` would be 'refs/heads/versioned-docs'.
+
+permissions:
+  contents: write
+
+# Ensure that no two site publications happen concurrently.
+# 1 job per reference can run concurrently, no cancellation
+concurrency:
+  group: site-publishing-${{ case(github.event_name == 'push', 'main', github.ref) }}
+  cancel-in-progress: false
+
+jobs:
+  site:
+
+    runs-on: ubuntu-latest
+
+    # This condition, which ensures the workflow is only run within the 'apache/polaris' repo, serves two purposes:
+    # 1. Not triggering the workflow from any other repo, as it declares a 'workflow_call' trigger (security).
+    # 2. Preventing forks from having "failed" site workflow runs (a publication won't work there).
+    if: github.repository == 'apache/polaris'
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          # Must mention the branch to check out explicitly.
+          # Otherwise the branch of the workflow-call (usually 'versioned-docs') would be checked out.
+          ref: "main"
+          persist-credentials: false
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: "versioned-docs"
+          path: site/content/releases
+          persist-credentials: false
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-env
+
+      - name: Install docker-compose
+        run: |
+          sudo curl -SL \
+            https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-linux-x86_64 \
+            -o /usr/local/bin/docker-compose
+          sudo chmod 755 /usr/local/bin/docker-compose
+          sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+      - name: Build Apache Site
+        run: site/bin/create-static-site.sh
+
+      - name: Copy .asf.yaml
+        run: sudo cp .asf.yaml site/build/apache-site/
+
+      - name: Deploy Static Site to GitHub
+        if: github.event_name == 'push' && github.repository == 'apache/polaris'
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: asf-site
+          publish_dir: ./site/build/apache-site
+          cname: polaris.apache.org

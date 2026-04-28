@@ -1,0 +1,108 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+[project]
+name = "apache-polaris"
+version = "1.4.0"
+description = "Apache Polaris"
+authors = [{ name = "Apache Software Foundation", email = "dev@polaris.apache.org" }]
+requires-python = ">=3.10,<3.14"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+keywords = [
+    "Apache Polaris",
+    "Polaris",
+    "Polaris Management Service",
+    "Apache Iceberg REST Catalog API",
+]
+dependencies = [
+    "urllib3>=1.25.3,<3.0.0",
+    "python-dateutil>=2.8.2",
+    "pydantic>=2.13.0,<2.14.0",
+    "typing-extensions>=4.7.1",
+    "boto3~=1.42.2",
+    "PyYAML>=6.0.3",
+    "prettytable>=3.17.0",
+]
+
+[project.urls]
+homepage = "https://polaris.apache.org/"
+repository = "https://github.com/apache/polaris/"
+
+[project.scripts]
+polaris = "apache_polaris.cli.polaris_cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>= 2.8.1",
+    "flake8>= 4.0.0",
+    "types-python-dateutil>= 2.8.19.14",
+    "mypy>=1.20, <=1.20.2",
+    "pyiceberg==0.11.1",
+    "pre-commit==4.5.1",
+    # 7.12.0 is the latest version to use due to OpenAPI spec version we are using
+    "openapi-generator-cli==7.12.0",
+    "pip-licenses-cli==4.0.0",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "generate_clients.py",
+    "apache_polaris",
+    "templates/",
+    ".openapi-generator-ignore",
+    "LICENSE",
+    "NOTICE",
+]
+
+[tool.hatch.build.targets.sdist.force-include]
+"spec" = "spec/"
+
+[tool.hatch.build.targets.wheel]
+include = ["apache_polaris"]
+
+[tool.hatch.build.hooks.custom]
+path = "hatch_build.py"
+
+[build-system]
+# 7.12.0 is the latest version to use due to OpenAPI spec version we are using
+requires = ["hatchling", "openapi-generator-cli==7.12.0"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+required-version = ">=0.9.0" # keep this as the first item for version parsing
+default-groups = [
+    "dev"
+]
+
+[tool.pip-licenses]
+partial-match = true
+allow-only = "Apache;BSD License;BSD-2-Clause;BSD-3-Clause;ISC;MIT;Mozilla Public License;PSF-2.0;Python Software Foundation License;The Unlicense"
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+publish-url = "https://upload.pypi.org/legacy/"
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple"
+publish-url = "https://test.pypi.org/legacy/"
