@@ -1,0 +1,52 @@
+services:
+  polaris-server:
+    image: apache/polaris:latest
+    container_name: polaris-server
+    ports:
+      - "8181:8181"
+      - "8182:8182"
+    environment:
+      POLARIS_PERSISTENCE_TYPE: relational-jdbc
+      POLARIS_PERSISTENCE_AUTO_BOOTSTRAP_TYPES: relational-jdbc
+      QUARKUS_DATASOURCE_DB_KIND: oracle
+      # ADW connection: thin driver reads tnsnames.ora + ojdbc.properties + sqlnet.ora
+      # from /wallet (bind-mounted below), resolves the alias, and uses the
+      # mTLS wallet automatically. Override these env vars from the shell to
+      # point at a different DB.
+      QUARKUS_DATASOURCE_JDBC_URL: ${QUARKUS_DATASOURCE_JDBC_URL:-jdbc:oracle:thin:@${ADW_CONNECT_ALIAS}?TNS_ADMIN=/wallet}
+      QUARKUS_DATASOURCE_USERNAME: ${QUARKUS_DATASOURCE_USERNAME:-POLARIS_SCHEMA}
+      QUARKUS_DATASOURCE_PASSWORD: ${QUARKUS_DATASOURCE_PASSWORD:-${POLARIS_SCHEMA_PWD:-Polaris#2026Schema}}
+      # Make sure the JDBC driver finds the wallet & ojdbc.properties.
+      TNS_ADMIN: /wallet
+      POLARIS_REALM_CONTEXT_REALMS: POLARIS
+      POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,${POLARIS_CLIENT_ID:-root},${POLARIS_CLIENT_SECRET:-s3cr3t}
+      POLARIS_AUTHENTICATION_TOKEN_BROKER_RSA_KEY_PAIR_PUBLIC_KEY_FILE: /keys/rsa.pub
+      POLARIS_AUTHENTICATION_TOKEN_BROKER_RSA_KEY_PAIR_PRIVATE_KEY_FILE: /keys/rsa.key
+      polaris.features."ALLOW_INSECURE_STORAGE_TYPES": "true"
+      polaris.features."SUPPORTED_CATALOG_STORAGE_TYPES": "[\"FILE\",\"S3\",\"GCS\",\"AZURE\"]"
+      polaris.features."DROP_WITH_PURGE_ENABLED": "true"
+      # Polaris does NOT vend STS credentials to clients; clients use their own AWS creds.
+      polaris.features."SKIP_CREDENTIAL_SUBSCOPING_INDIRECTION": "true"
+      # AWS creds for Polaris's own server-side S3 access (path validation, etc.).
+      # Pass-through from the shell where you run `make polaris-up`.
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_REGION: ${AWS_REGION:-us-west-1}
+      QUARKUS_LOG_CATEGORY__ORG_HIBERNATE_VALIDATOR__LEVEL: ERROR
+      QUARKUS_LOG_CATEGORY__IO_MICROMETER_CORE_INSTRUMENT__LEVEL: ERROR
+      QUARKUS_OTEL_SDK_DISABLED: "true"
+      QUARKUS_MICROMETER_ENABLED: "false"
+    volumes:
+      - ./.dev/keys:/keys:ro
+      # mTLS wallet for ADW. Read-only mount; the wallet on the host is the
+      # one downloaded from OCI Console -> DB Connection -> Download Wallet.
+      - ${HOME}/.oracle/wallets/adw:/wallet:ro
+    extra_hosts:
+      # Allow `host.docker.internal` to resolve on Linux too (no-op on macOS/Windows where it's built in).
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8182/q/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
