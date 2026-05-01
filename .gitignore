@@ -48,3 +48,6 @@ node_modules/
 
 # Local dev artifacts (token-broker keys, etc.)
 .dev/
+
+# Server logs
+runtime/server/logs/

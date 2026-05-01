@@ -25,7 +25,7 @@ PYTHON ?= python3
 BUILD_IMAGE ?= true
 DOCKER ?= docker
 MINIKUBE_PROFILE ?= minikube
-DEPENDENCIES ?= ct helm helm-docs java21 git yamllint
+DEPENDENCIES ?= ct helm helm-docs java git yamllint
 OPTIONAL_DEPENDENCIES := jq kubectl minikube
 PYTHON_CLIENT_DIR := client/python
 
@@ -49,54 +49,50 @@ version: ## Display version information
 .PHONY: build
 build: build-server build-admin ## Build Polaris server, admin, and container images
 
-build-admin: DEPENDENCIES := java21 $(DOCKER)
+build-admin: DEPENDENCIES := $(DOCKER)
 .PHONY: build-admin
 build-admin: check-dependencies ## Build Polaris admin and container image
 	@echo "--- Building Polaris admin ---"
-	@./gradlew \
+	@BUILDKIT_PULL_POLICY=if-not-present ./gradlew \
 		:polaris-admin:assemble \
 		:polaris-admin:quarkusAppPartsBuild --rerun \
 		-Dquarkus.container-image.build=$(BUILD_IMAGE) \
 		-Dquarkus.docker.executable-name=$(DOCKER)
 	@echo "--- Polaris admin build complete ---"
 
-build-cleanup: DEPENDENCIES := java21
 .PHONY: build-cleanup
-build-cleanup: check-dependencies ## Clean build artifacts
+build-cleanup: ## Clean build artifacts
 	@echo "--- Cleaning up build artifacts ---"
 	@./gradlew clean
 	@echo "--- Build artifacts cleaned ---"
 
-build-server: DEPENDENCIES := java21 $(DOCKER)
+build-server: DEPENDENCIES := $(DOCKER)
 .PHONY: build-server
 build-server: check-dependencies ## Build Polaris server and container image
 	@echo "--- Building Polaris server ---"
-	@./gradlew \
+	@BUILDKIT_PULL_POLICY=if-not-present ./gradlew \
 		:polaris-server:assemble \
 		:polaris-server:quarkusAppPartsBuild --rerun \
 		-Dquarkus.container-image.build=$(BUILD_IMAGE) \
 		-Dquarkus.docker.executable-name=$(DOCKER)
 	@echo "--- Polaris server build complete ---"
 
-build-spark-plugin-3.5-2.12: DEPENDENCIES := java21
 .PHONY: build-spark-plugin-3.5-2.12
-build-spark-plugin-3.5-2.12: check-dependencies ## Build Spark plugin v3.5 with Scala v2.12
+build-spark-plugin-3.5-2.12: ## Build Spark plugin v3.5 with Scala v2.12
 	@echo "--- Building Spark plugin v3.5 with Scala v2.12 ---"
 	@./gradlew \
 		:polaris-spark-3.5_2.12:assemble
 	@echo "--- Spark plugin v3.5 with Scala v2.12 build complete ---"
 
-build-spark-plugin-3.5-2.13: DEPENDENCIES := java21
 .PHONY: build-spark-plugin-3.5-2.13
-build-spark-plugin-3.5-2.13: check-dependencies ## Build Spark plugin v3.5 with Scala v2.13
+build-spark-plugin-3.5-2.13: ## Build Spark plugin v3.5 with Scala v2.13
 	@echo "--- Building Spark plugin v3.5 with Scala v2.13 ---"
 	@./gradlew \
 		:polaris-spark-3.5_2.13:assemble
 	@echo "--- Spark plugin v3.5 with Scala v2.13 build complete ---"
 
-spotless-apply: DEPENDENCIES := java21
 .PHONY: spotless-apply
-spotless-apply: check-dependencies ## Apply code formatting using Spotless Gradle plugin.
+spotless-apply: ## Apply code formatting using Spotless Gradle plugin.
 	@echo "--- Applying Spotless formatting ---"
 	@./gradlew spotlessApply
 	@echo "--- Spotless formatting applied ---"
@@ -132,14 +128,9 @@ oracle-check: ## Check Oracle reachability and ojdbc11 availability
 		echo "ojdbc11 jar: $(OJDBC_JAR)"; \
 	fi
 
-.PHONY: oracle-reset
-oracle-reset: ## Drop and recreate POLARIS_SCHEMA on Oracle (DBA priv required)
-	@if [ -z "$(OJDBC_JAR)" ]; then \
-		echo "ERROR: ojdbc11 jar not found in Gradle cache. Run 'make build-server' once to populate it."; \
-		exit 1; \
-	fi
-	@echo "--- Resetting POLARIS_SCHEMA on $(ORACLE_JDBC_URL) ---"
-	@$(ORACLE_TEST_ENV) java -cp "$(OJDBC_JAR)" tools/scripts/PolarisSchemaReset.java
+.PHONY: adw-reset
+adw-reset: ## Drop and recreate POLARIS_SCHEMA on ADW (uses TNS_ADMIN wallet + ADW_ADMIN_PWD)
+	@./tools/scripts/setup_polaris_on_adw.sh
 
 .PHONY: test-unit
 test-unit: ## Run pure unit tests (no Oracle connection needed)
@@ -195,13 +186,48 @@ $(DEV_PRIVATE_KEY):
 $(DEV_PUBLIC_KEY): $(DEV_PRIVATE_KEY)
 	@openssl rsa -in $(DEV_PRIVATE_KEY) -pubout -out $(DEV_PUBLIC_KEY) 2>/dev/null
 
-.PHONY: run-polaris
-run-polaris: dev-keys ## Start the Polaris server pointing at Oracle (Ctrl+C to stop)
+.PHONY: run-polaris-gradle
+run-polaris-gradle: dev-keys ## Start the Polaris server natively via Gradle (no Docker; Ctrl+C to stop)
 	@echo "--- Starting Polaris server against $(ORACLE_JDBC_URL) ---"
 	@echo "Bootstrap credentials: POLARIS,root,s3cr3t"
 	@echo "HTTP API on :8181, management on :8182"
 	@echo "Token-broker keys: $(DEV_KEYS_DIR)/ (regenerate with: rm -rf $(DEV_DIR))"
 	@$(ORACLE_TEST_ENV) $(RUN_POLARIS_KEY_ENV) $(RUN_POLARIS_LOG_ENV) ./gradlew :polaris-server:run
+
+##@ Polaris (Docker)
+
+DOCKER_COMPOSE ?= $(DOCKER) compose
+
+.PHONY: build-polaris-cli
+build-polaris-cli: ## Build the Polaris CLI Docker image (apache/polaris-cli:latest)
+	@echo "--- Building apache/polaris-cli:latest ---"
+	@BUILDKIT_PULL_POLICY=if-not-present $(DOCKER) build -f runtime/cli/Dockerfile -t apache/polaris-cli:latest .
+	@echo "--- CLI image built ---"
+
+.PHONY: build-polaris-images
+build-polaris-images: build build-polaris-cli ## Build server, admin-tool, and CLI Docker images
+
+.PHONY: polaris-up
+polaris-up: dev-keys ## Start the Polaris server in Docker (against ADW by default)
+	@echo "--- Starting polaris-server (Oracle JDBC URL: $${QUARKUS_DATASOURCE_JDBC_URL:-jdbc:oracle:thin:@$${ADW_CONNECT_ALIAS}?TNS_ADMIN=/wallet}) ---"
+	@if [ -z "$${ADW_CONNECT_ALIAS:-}" ] && [ -z "$${QUARKUS_DATASOURCE_JDBC_URL:-}" ]; then \
+		echo "ERROR: ADW_CONNECT_ALIAS not set. Export it from your shell or pass QUARKUS_DATASOURCE_JDBC_URL."; \
+		exit 1; \
+	fi
+	@$(DOCKER_COMPOSE) up -d polaris-server
+	@$(DOCKER_COMPOSE) ps
+
+.PHONY: polaris-down
+polaris-down: ## Stop the Polaris Docker stack
+	@$(DOCKER_COMPOSE) down
+
+.PHONY: polaris-logs
+polaris-logs: ## Tail the Polaris server logs
+	@$(DOCKER_COMPOSE) logs -f polaris-server
+
+.PHONY: polaris-cli
+polaris-cli: ## Run the CLI in a one-shot container. Pass args via ARGS, e.g. make polaris-cli ARGS="catalogs list"
+	@$(DOCKER_COMPOSE) --profile cli run --rm polaris-cli --host polaris-server --port 8181 $(ARGS)
 
 ##@ Polaris Client
 
@@ -451,12 +477,13 @@ check-dependencies: ## Check if all requested dependencies are present
 	@echo "--- Checking for requested dependencies ---"
 	@for dependency in $(DEPENDENCIES); do \
 		echo "Checking for $$dependency..."; \
-		if [ "$$dependency" = "java21" ]; then \
-			if java --version | head -n1 | cut -d' ' -f2 | grep -q '^21\.'; then \
-			echo "Java 21 is installed."; \
+		if [ "$$dependency" = "java" ]; then \
+			if [ -n "$$JAVA_HOME" ] && [ -x "$$JAVA_HOME/bin/java" ] && "$$JAVA_HOME/bin/java" --version >/dev/null 2>&1; then \
+				echo "Java found via JAVA_HOME=$$JAVA_HOME ($$($$JAVA_HOME/bin/java --version 2>&1 | head -n1))."; \
+			elif java --version >/dev/null 2>&1; then \
+				echo "Java found on PATH ($$(java --version 2>&1 | head -n1)). Tip: set JAVA_HOME to pin a specific JDK."; \
 			else \
-				echo "Java 21 is NOT installed."; \
-				echo "--- ERROR: Dependency 'Java 21' is missing. Please install it to proceed. Exiting. ---"; \
+				echo "--- ERROR: No working Java found. Set JAVA_HOME to a JDK install (Gradle's toolchain validates the actual version). Exiting. ---"; \
 				exit 1; \
 			fi ; \
 		elif command -v $$dependency >/dev/null 2>&1; then \
@@ -484,15 +511,16 @@ install-dependencies-brew: check-brew ## Install dependencies if not present via
 	@echo "--- Checking and installing dependencies for this target ---"
 	@for dependency in $(DEPENDENCIES); do \
 		case $$dependency in \
-			java21) \
-				if java -version 2>&1 | grep -q '21'; then \
+			java) \
+				if [ -n "$$JAVA_HOME" ] && [ -x "$$JAVA_HOME/bin/java" ]; then \
+					:; \
+				elif command -v java >/dev/null 2>&1; then \
 					:; \
 				else \
-					echo "Java 21 is not installed. Installing openjdk@21 and jenv..."; \
-					brew install openjdk@21 jenv; \
-					$(shell brew --prefix jenv)/bin/jenv add $(shell brew --prefix openjdk@21); \
-					jenv local 21; \
-					echo "Java 21 installed."; \
+					echo "Java is not installed. Installing openjdk and jenv..."; \
+					brew install openjdk jenv; \
+					$(shell brew --prefix jenv)/bin/jenv add $(shell brew --prefix openjdk); \
+					echo "Java installed via Homebrew. Set JAVA_HOME or rely on Gradle's toolchain."; \
 				fi ;; \
 			docker|podman) \
 				if command -v $$dependency >/dev/null 2>&1; then \

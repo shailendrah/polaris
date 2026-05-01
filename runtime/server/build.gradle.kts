@@ -34,6 +34,9 @@ dependencies {
   implementation(project(":polaris-runtime-service"))
 
   runtimeOnly(libs.oracle.jdbc)
+  // Required for connecting to ADB with the downloaded SSO wallet
+  // (cwallet.sso). Provides the Oracle PKI security provider.
+  runtimeOnly(libs.oracle.pki)
   runtimeOnly(project(":polaris-relational-jdbc"))
   runtimeOnly("io.quarkus:quarkus-jdbc-oracle")
   runtimeOnly(project(":polaris-extensions-federation-hadoop"))

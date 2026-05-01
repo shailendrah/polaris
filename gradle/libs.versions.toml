@@ -88,6 +88,10 @@ microprofile-fault-tolerance-api = { module = "org.eclipse.microprofile.fault-to
 mockito-core = { module = "org.mockito:mockito-core", version = "5.23.0" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version = "5.23.0" }
 oracle-jdbc = { module = "com.oracle.database.jdbc:ojdbc11", version = "23.9.0.25.07" }
+# Oracle PKI provider — required so the JDBC driver can read the auto-login
+# (cwallet.sso) wallet downloaded from ADB. Without it the driver fails on
+# connect with ORA-17957 / "SSO KeyStore not available".
+oracle-pki = { module = "com.oracle.database.security:oraclepki", version = "23.9.0.25.07" }
 opentelemetry-instrumentation-bom-alpha = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha", version= "2.20.1-alpha" }
 picocli = { module = "info.picocli:picocli-codegen", version.ref = "picocli" }
 picocli-codegen = { module = "info.picocli:picocli-codegen", version.ref = "picocli" }
