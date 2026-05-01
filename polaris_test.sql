@@ -62,9 +62,9 @@ DEFINE lakehouse_pwd = 'Lh0use#2026Demo'
 
 -- Current metadata.json URLs for the three Iceberg tables. Refresh from
 -- ./polaris_test.sh whenever the underlying tables get new snapshots.
-DEFINE users_meta    = 'https://skmawsbucket1.s3.us-west-1.amazonaws.com/polaris-iceberg/demo/users/metadata/00001-REPLACE-ME.metadata.json'
-DEFINE orders_meta   = 'https://skmawsbucket1.s3.us-west-1.amazonaws.com/polaris-iceberg/demo/orders/metadata/00001-REPLACE-ME.metadata.json'
-DEFINE products_meta = 'https://skmawsbucket1.s3.us-west-1.amazonaws.com/polaris-iceberg/demo/products/metadata/00001-REPLACE-ME.metadata.json'
+DEFINE users_meta    = 'https://skmawsbucket1.s3.us-west-1.amazonaws.com/polaris-iceberg/demo/users/metadata/00001-e51e8e9f-d7b0-4f23-b131-8d744836a6a4.metadata.json'
+DEFINE orders_meta   = 'https://skmawsbucket1.s3.us-west-1.amazonaws.com/polaris-iceberg/demo/orders/metadata/00001-d06a0c43-78cd-4743-81a6-8993a2b092c8.metadata.json'
+DEFINE products_meta = 'https://skmawsbucket1.s3.us-west-1.amazonaws.com/polaris-iceberg/demo/products/metadata/00001-fb486fe2-5869-4770-b920-442e653cf73a.metadata.json'
 
 -- ============================================================================
 -- A. Provision the LAKEHOUSE user (as DBA &dba_user). Idempotent.
