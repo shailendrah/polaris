@@ -51,7 +51,9 @@ curl -fsS -X POST "${POLARIS_HTTP}/api/management/v1/catalogs" \
     "type": "INTERNAL",
     "properties": {
       "default-base-location": "${WAREHOUSE}",
-      "s3.endpoint": "${S3_ENDPOINT}"
+      "s3.endpoint": "${S3_ENDPOINT}",
+      "s3.region": "${OCI_REGION}",
+      "s3.path-style-access": "false"
     },
     "storageConfigInfo": {
       "storageType": "S3",
