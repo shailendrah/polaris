@@ -41,7 +41,8 @@ curl -fsS -X POST "${POLARIS_HTTP}/api/management/v1/catalogs" \
     "name": "${CATALOG_NAME}",
     "type": "INTERNAL",
     "properties": {
-      "default-base-location": "${WAREHOUSE}"
+      "default-base-location": "${WAREHOUSE}",
+      "s3.region": "${AWS_REGION}"
     },
     "storageConfigInfo": {
       "storageType": "S3",
