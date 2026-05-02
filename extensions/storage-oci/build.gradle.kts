@@ -31,6 +31,10 @@ dependencies {
   implementation("org.apache.iceberg:iceberg-api")
   implementation("org.apache.iceberg:iceberg-core")
 
+  // Apache Avro for low-level container-file round-trips (schema-agnostic
+  // URI rewriting in manifest-list/manifest avros).
+  implementation("org.apache.avro:avro")
+
   // CDI for runtime registration in the Quarkus runtime module.
   implementation(libs.jakarta.enterprise.cdi.api)
   implementation(libs.smallrye.common.annotation)
@@ -40,4 +44,5 @@ dependencies {
   testImplementation(platform(libs.junit.bom))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation(libs.assertj.core)
+  testImplementation(libs.mockito.core)
 }

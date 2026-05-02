@@ -19,71 +19,137 @@
 package org.apache.polaris.extension.storage.oci;
 
 import jakarta.annotation.Nonnull;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
+import org.apache.iceberg.Snapshot;
 import org.apache.iceberg.TableMetadata;
 import org.apache.iceberg.io.FileIO;
+import org.apache.iceberg.io.PositionOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Rewrites the on-disk avro files of a freshly-committed iceberg table snapshot so the
- * {@code data_file.file_path} fields inside manifests, and the {@code manifest_path} fields inside
- * the manifest-list, all point at OCI native URLs.
+ * Per-snapshot avro post-processor: walks each snapshot's manifest-list and the manifest avros it
+ * references, copies them with all {@code s3a?://} URIs rewritten to OCI native URLs, and stores
+ * the rewritten copies alongside the originals.
  *
- * <p>Workflow per commit:
+ * <p>The rewritten avros use the same on-disk schema as the originals — the only delta is the
+ * URI strings inside record fields. Iceberg readers (including ADW's iceberg engine) can consume
+ * them indistinguishably from the originals.
+ *
+ * <p><b>What this does</b>
  *
  * <ol>
- *   <li>For each {@code Snapshot} not yet rewritten, read its manifest-list avro.
- *   <li>For each {@code ManifestFile} in the list, read the manifest avro, write a new manifest
- *       avro (in a sibling location) where every {@code DataFile.path} is OCI native.
- *   <li>Write a new manifest-list pointing at the new manifests, with each
- *       {@code ManifestFile.path} also OCI native.
- *   <li>Build a new {@code TableMetadata} pointing at the new manifest list, write a new
- *       {@code metadata.json}, and return its location so the catalog can update its pointer.
+ *   <li>For each snapshot in {@code current}, fetch its manifest-list avro from {@code io}.
+ *   <li>Run it through {@link GenericAvroRewriter} (URI strings rewritten anywhere in the
+ *       record tree).
+ *   <li>Write the rewritten manifest-list to a sibling path with a {@code .oci.avro} suffix.
+ *   <li>For each {@code manifest_path} referenced from the rewritten list, do the same — read
+ *       the manifest avro, rewrite, write to {@code <original>.oci.avro}.
  * </ol>
  *
- * <p>The original avros and metadata.json are never modified — they remain on disk for any
- * S3-compat reader that needs them. Polaris's catalog pointer for OCI catalogs always points at
- * the rewritten metadata.json.
- *
- * <p><b>Implementation status:</b> skeleton only. The avro round-trip uses iceberg's own
- * {@code ManifestFiles.read/write} and {@code ManifestLists.read/write} APIs, but careful
- * handling of:
+ * <p><b>What this DOES NOT do (yet)</b>
  *
  * <ul>
- *   <li>format-version 1 vs 2 (partition spec evolution, sequence numbers)
- *   <li>partition specs map (Map of Integer to PartitionSpec, covering every historical spec)
- *   <li>delete files (v2) — separate manifest type
- *   <li>statistics file paths in {@code TableMetadata}
- *   <li>partition statistics file paths
- *   <li>existing {@code metadata-log} entries (must NOT be rewritten — they reference prior
- *       metadata.json files that are still on disk in their original form)
+ *   <li>Build a new {@link TableMetadata} that points at the rewritten avros — that's the
+ *       caller's job (e.g. the iceberg-REST commit handler), because the catalog also needs to
+ *       persist the new {@code metadata-location}.
+ *   <li>Rewrite delete-file manifests separately. Format-version 2 stores delete files via the
+ *       same manifest avro structure (with a {@code content} field set to {@code 1} or {@code 2});
+ *       since we round-trip the entire record generically, those URIs are also caught.
+ *   <li>Touch {@code metadata-log} entries — those reference earlier {@code metadata.json} files
+ *       and must remain pointing at the original on-disk versions.
  * </ul>
- *
- * is required before this is production-ready. The {@link #rewrite} method below currently throws.
  */
 public final class OciManifestRewriter {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(OciManifestRewriter.class);
+
+  /** Suffix appended to original avro paths to produce the rewritten copy's path. */
+  static final String REWRITTEN_SUFFIX = ".oci.avro";
+
   private final OciUriRewriter uriRewriter;
+  private final GenericAvroRewriter avroRewriter;
   private final FileIO io;
 
   public OciManifestRewriter(@Nonnull OciUriRewriter uriRewriter, @Nonnull FileIO io) {
     this.uriRewriter = uriRewriter;
+    this.avroRewriter = new GenericAvroRewriter(uriRewriter);
     this.io = io;
   }
 
   /**
-   * Rewrites a table's manifests and manifest-list to use OCI native URLs, then returns a new
-   * {@link TableMetadata} pointing at the rewritten avros (with {@code metadata-location} suitable
-   * for catalog persistence).
-   *
-   * @param current the just-committed metadata
-   * @return a new metadata referencing rewritten avros
-   * @throws UnsupportedOperationException until the implementation lands
+   * Rewrites every avro file referenced by every snapshot in {@code current}, producing
+   * {@code <original>.oci.avro} sibling files. Returns the set of original→rewritten path pairs
+   * actually written so callers can build a new metadata.json that points at them.
    */
-  public TableMetadata rewrite(@Nonnull TableMetadata current) {
-    // Reserved for the avro round-trip implementation. See javadoc above for
-    // the full list of fields that need rewriting.
-    throw new UnsupportedOperationException(
-        "OciManifestRewriter.rewrite is not yet implemented. "
-            + "See class javadoc for the per-snapshot/per-manifest steps.");
+  public RewrittenPaths rewriteAll(@Nonnull TableMetadata current) throws IOException {
+    RewrittenPaths result = new RewrittenPaths();
+    Set<String> processedManifests = new HashSet<>();
+    for (Snapshot snapshot : current.snapshots()) {
+      String listPath = snapshot.manifestListLocation();
+      if (listPath == null || result.containsManifestList(listPath)) {
+        continue;
+      }
+      // Read the original manifest-list to find all manifests it references —
+      // we need their original (s3://) paths to fetch the bytes. Then we
+      // rewrite the list itself; the rewritten list will reference the
+      // rewritten manifest paths because GenericAvroRewriter applies to every
+      // string in the list's records.
+      byte[] originalList = readAll(listPath);
+      Set<String> referencedManifests = ManifestListIntrospector.manifestPaths(originalList);
+
+      byte[] rewrittenList = avroRewriter.rewrite(originalList);
+      String rewrittenListPath = listPath + REWRITTEN_SUFFIX;
+      writeAll(rewrittenListPath, rewrittenList);
+      result.addManifestList(listPath, rewrittenListPath);
+      LOGGER.debug(
+          "Rewrote manifest-list {} → {} ({} bytes, {} manifests)",
+          listPath,
+          rewrittenListPath,
+          rewrittenList.length,
+          referencedManifests.size());
+
+      for (String manifestPath : referencedManifests) {
+        if (!processedManifests.add(manifestPath)) {
+          continue;
+        }
+        byte[] originalManifest = readAll(manifestPath);
+        byte[] rewrittenManifest = avroRewriter.rewrite(originalManifest);
+        String rewrittenManifestPath = manifestPath + REWRITTEN_SUFFIX;
+        writeAll(rewrittenManifestPath, rewrittenManifest);
+        result.addManifest(manifestPath, rewrittenManifestPath);
+        LOGGER.debug(
+            "Rewrote manifest {} → {} ({} bytes)",
+            manifestPath,
+            rewrittenManifestPath,
+            rewrittenManifest.length);
+      }
+    }
+    return result;
+  }
+
+  // -- IO helpers (kept simple; no streaming because manifest avros are tiny) --
+
+  private byte[] readAll(String path) throws IOException {
+    try (InputStream in = io.newInputFile(path).newStream()) {
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      byte[] buf = new byte[8192];
+      int n;
+      while ((n = in.read(buf)) >= 0) {
+        bos.write(buf, 0, n);
+      }
+      return bos.toByteArray();
+    }
+  }
+
+  private void writeAll(String path, byte[] bytes) throws IOException {
+    try (PositionOutputStream out = io.newOutputFile(path).createOrOverwrite()) {
+      out.write(bytes);
+    }
   }
 
   OciUriRewriter uriRewriter() {
