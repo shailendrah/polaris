@@ -118,7 +118,9 @@ import org.apache.polaris.core.storage.PolarisStorageConfigurationInfo;
 import org.apache.polaris.core.storage.StorageAccessConfig;
 import org.apache.polaris.core.storage.StorageUtil;
 import org.apache.polaris.core.storage.oci.OciStorageConfigurationInfo;
+import org.apache.polaris.extension.storage.oci.OciManifestRewriter;
 import org.apache.polaris.extension.storage.oci.OciUriRewriter;
+import org.apache.polaris.extension.storage.oci.RewrittenPaths;
 import org.apache.polaris.extension.storage.oci.TableMetadataRewriter;
 import org.apache.polaris.immutables.PolarisImmutable;
 import org.apache.polaris.service.catalog.AccessDelegationMode;
@@ -980,28 +982,78 @@ public abstract class IcebergCatalogHandler extends CatalogHandler implements Au
   }
 
   /**
+   * After a commit, if the table is on OCI Object Storage, run the avro post-processor so the new
+   * snapshot's manifest-list and manifest avros have rewritten copies on disk with OCI native URIs
+   * inside. Best-effort: failures are logged but don't fail the commit (the commit itself already
+   * succeeded; readers will fall back to the original avros until the rewriter retries).
+   */
+  private void maybeRewriteOciAvros(
+      TableIdentifier tableIdentifier, LoadTableResponse response) {
+    PolarisResolvedPathWrapper resolvedStoragePath =
+        CatalogUtils.findResolvedStorageEntity(resolutionManifest, tableIdentifier);
+    OciStorageConfigurationInfo oci = resolvedOciConfig(resolvedStoragePath);
+    if (oci == null) {
+      return;
+    }
+    TableMetadata committed = response.tableMetadata();
+    if (committed == null || committed.snapshots().isEmpty()) {
+      return;
+    }
+    try {
+      OciUriRewriter uriRewriter = new OciUriRewriter(oci.getNamespace(), oci.getRegion());
+      // Reuse the base catalog's FileIO — same credentials and S3-compat
+      // endpoint Polaris already uses for the table's own write path.
+      org.apache.iceberg.io.FileIO io =
+          ((org.apache.iceberg.BaseTable) baseCatalog.loadTable(tableIdentifier)).operations().io();
+      OciManifestRewriter rewriter = new OciManifestRewriter(uriRewriter, io);
+      RewrittenPaths paths = rewriter.rewriteAll(committed);
+      LOGGER
+          .atInfo()
+          .addKeyValue("table", tableIdentifier)
+          .addKeyValue("manifest_lists", paths.manifestLists().size())
+          .addKeyValue("manifests", paths.manifests().size())
+          .log("Rewrote avros for OCI Object Storage catalog");
+    } catch (Exception e) {
+      LOGGER
+          .atWarn()
+          .addKeyValue("table", tableIdentifier)
+          .setCause(e)
+          .log("Failed to post-process OCI avros; readers will fall back to original avros");
+    }
+  }
+
+  /**
+   * Looks up the resolved storage configuration for a table and returns it iff it's an
+   * {@link OciStorageConfigurationInfo}. Otherwise returns {@code null}.
+   */
+  @Nullable
+  private OciStorageConfigurationInfo resolvedOciConfig(
+      @Nullable PolarisResolvedPathWrapper resolvedStoragePath) {
+    if (resolvedStoragePath == null) {
+      return null;
+    }
+    return org.apache.polaris.service.catalog.io.FileIOUtil.findStorageInfoFromHierarchy(
+            resolvedStoragePath)
+        .map(
+            e ->
+                e.getInternalPropertiesAsMap()
+                    .get(
+                        org.apache.polaris.core.entity.PolarisEntityConstants
+                            .getStorageConfigInfoPropertyName()))
+        .map(PolarisStorageConfigurationInfo::deserialize)
+        .filter(info -> info instanceof OciStorageConfigurationInfo)
+        .map(info -> (OciStorageConfigurationInfo) info)
+        .orElse(null);
+  }
+
+  /**
    * If the resolved storage configuration for this table is OCI Object Storage, returns a
    * {@link TableMetadata} with all {@code s3://} URIs rewritten to native OCI URLs.
    * Otherwise returns {@code metadata} unchanged.
    */
   private TableMetadata maybeRewriteForOci(
       TableMetadata metadata, @Nullable PolarisResolvedPathWrapper resolvedStoragePath) {
-    if (resolvedStoragePath == null) {
-      return metadata;
-    }
-    OciStorageConfigurationInfo oci =
-        org.apache.polaris.service.catalog.io.FileIOUtil.findStorageInfoFromHierarchy(
-                resolvedStoragePath)
-            .map(
-                e ->
-                    e.getInternalPropertiesAsMap()
-                        .get(
-                            org.apache.polaris.core.entity.PolarisEntityConstants
-                                .getStorageConfigInfoPropertyName()))
-            .map(PolarisStorageConfigurationInfo::deserialize)
-            .filter(info -> info instanceof OciStorageConfigurationInfo)
-            .map(info -> (OciStorageConfigurationInfo) info)
-            .orElse(null);
+    OciStorageConfigurationInfo oci = resolvedOciConfig(resolvedStoragePath);
     if (oci == null) {
       return metadata;
     }
@@ -1076,8 +1128,16 @@ public abstract class IcebergCatalogHandler extends CatalogHandler implements Au
     if (catalog.isStaticFacade()) {
       throw new BadRequestException("Cannot update table on static-facade external catalogs.");
     }
-    return catalogHandlerUtils()
-        .updateTable(baseCatalog, tableIdentifier, applyUpdateFilters(request));
+    LoadTableResponse response =
+        catalogHandlerUtils()
+            .updateTable(baseCatalog, tableIdentifier, applyUpdateFilters(request));
+    // For OCI Object Storage catalogs, post-process the just-committed
+    // snapshot's manifest-list and manifest avros so they contain OCI
+    // native URLs internally. Without this, ADW reading the rewritten
+    // metadata.json (LoadTable response above) would still get s3:// URIs
+    // when it follows the manifest references.
+    maybeRewriteOciAvros(tableIdentifier, response);
+    return response;
   }
 
   public LoadTableResponse updateTableForStagedCreate(

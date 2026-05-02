@@ -47,9 +47,11 @@ class TableMetadataRewriterTest {
         .contains(
             "\"https://objectstorage.us-sanjose-1.oraclecloud.com"
                 + "/n/axydmvgg0v5v/b/polaris-iceberg/o/demo/users\"")
+        // manifest-list specifically gets a .oci.avro suffix so readers reach
+        // the rewritten copy.
         .contains(
-            "\"https://objectstorage.us-sanjose-1.oraclecloud.com"
-                + "/n/axydmvgg0v5v/b/polaris-iceberg/o/demo/users/metadata/snap-42.avro\"");
+            "\"manifest-list\":\"https://objectstorage.us-sanjose-1.oraclecloud.com"
+                + "/n/axydmvgg0v5v/b/polaris-iceberg/o/demo/users/metadata/snap-42.avro.oci.avro\"");
   }
 
   @Test

@@ -42,6 +42,14 @@ public final class TableMetadataRewriter {
   private static final Pattern S3_IN_JSON =
       Pattern.compile("\"s3a?://([^\"]+)\"");
 
+  /**
+   * Matches the iceberg-metadata-spec {@code "manifest-list":"s3...avro"} field. We special-case
+   * this to also append {@link OciManifestRewriter#REWRITTEN_SUFFIX} so the URI points readers at
+   * the rewritten manifest-list copy on disk (which contains rewritten internal manifest-paths).
+   */
+  private static final Pattern MANIFEST_LIST_S3_IN_JSON =
+      Pattern.compile("\"manifest-list\"\\s*:\\s*\"s3a?://([^\"]+)\"");
+
   private final OciUriRewriter uriRewriter;
 
   public TableMetadataRewriter(@Nonnull OciUriRewriter uriRewriter) {
@@ -66,15 +74,31 @@ public final class TableMetadataRewriter {
 
   /** Visible for testing — applies the regex rewrite without re-parsing. */
   String rewriteJson(@Nonnull String json) {
-    Matcher m = S3_IN_JSON.matcher(json);
-    StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      String original = "s3" + (m.group(0).charAt(3) == 'a' ? "a" : "") + "://" + m.group(1);
-      String replaced = uriRewriter.rewrite(original);
-      // Re-quote and escape regex replacement metacharacters.
-      m.appendReplacement(sb, Matcher.quoteReplacement("\"" + replaced + "\""));
+    // Pass 1: manifest-list fields get URI-rewrite + .oci.avro suffix so
+    // readers fetch the rewritten copy (which has internal manifest_path
+    // entries already pointing at the rewritten .oci.avro manifests).
+    Matcher m1 = MANIFEST_LIST_S3_IN_JSON.matcher(json);
+    StringBuffer pass1 = new StringBuffer();
+    while (m1.find()) {
+      // Reconstruct the full original URI from the captured group; the
+      // captured part doesn't include the "s3://"/"s3a://" prefix.
+      String original = m1.group(0).substring(m1.group(0).indexOf("\"s3") + 1);
+      original = original.substring(0, original.length() - 1); // strip trailing quote
+      String rewritten = uriRewriter.rewrite(original) + OciManifestRewriter.REWRITTEN_SUFFIX;
+      m1.appendReplacement(
+          pass1, Matcher.quoteReplacement("\"manifest-list\":\"" + rewritten + "\""));
     }
-    m.appendTail(sb);
-    return sb.toString();
+    m1.appendTail(pass1);
+
+    // Pass 2: all remaining s3:// URIs get plain s3:// → https:// rewriting.
+    Matcher m2 = S3_IN_JSON.matcher(pass1.toString());
+    StringBuffer pass2 = new StringBuffer();
+    while (m2.find()) {
+      String original = m2.group(0).substring(1, m2.group(0).length() - 1); // strip outer quotes
+      String replaced = uriRewriter.rewrite(original);
+      m2.appendReplacement(pass2, Matcher.quoteReplacement("\"" + replaced + "\""));
+    }
+    m2.appendTail(pass2);
+    return pass2.toString();
   }
 }
