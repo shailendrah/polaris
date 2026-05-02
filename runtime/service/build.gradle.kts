@@ -30,6 +30,10 @@ dependencies {
   implementation(project(":polaris-api-management-service"))
   implementation(project(":polaris-api-iceberg-service"))
   implementation(project(":polaris-api-catalog-service"))
+  // OCI Object Storage URI rewriter — used when serving LoadTable
+  // responses for OCI_OBJECT_STORE catalogs to translate s3:// to native
+  // OCI URLs that work with non-S3-compat readers (e.g. ADW iceberg).
+  implementation(project(":polaris-extensions-storage-oci"))
 
   runtimeOnly(project(":polaris-relational-jdbc"))
 

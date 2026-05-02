@@ -114,8 +114,12 @@ import org.apache.polaris.core.persistence.resolver.ResolverFactory;
 import org.apache.polaris.core.persistence.resolver.ResolverStatus;
 import org.apache.polaris.core.rest.PolarisEndpoints;
 import org.apache.polaris.core.storage.PolarisStorageActions;
+import org.apache.polaris.core.storage.PolarisStorageConfigurationInfo;
 import org.apache.polaris.core.storage.StorageAccessConfig;
 import org.apache.polaris.core.storage.StorageUtil;
+import org.apache.polaris.core.storage.oci.OciStorageConfigurationInfo;
+import org.apache.polaris.extension.storage.oci.OciUriRewriter;
+import org.apache.polaris.extension.storage.oci.TableMetadataRewriter;
 import org.apache.polaris.immutables.PolarisImmutable;
 import org.apache.polaris.service.catalog.AccessDelegationMode;
 import org.apache.polaris.service.catalog.AccessDelegationModeResolver;
@@ -913,10 +917,18 @@ public abstract class IcebergCatalogHandler extends CatalogHandler implements Au
       Optional<AccessDelegationMode> delegationMode,
       Set<PolarisStorageActions> actions,
       Optional<String> refreshCredentialsEndpoint) {
-    LoadTableResponse.Builder responseBuilder =
-        LoadTableResponse.builder().withTableMetadata(tableMetadata);
     PolarisResolvedPathWrapper resolvedStoragePath =
         CatalogUtils.findResolvedStorageEntity(resolutionManifest, tableIdentifier);
+
+    // For OCI Object Storage catalogs, rewrite s3:// URIs in the table metadata
+    // to native OCI URLs before serving the LoadTable response. Readers like
+    // ADW's iceberg engine that don't honor s3.endpoint overrides need URLs
+    // they can fetch directly. Writers continue using s3:// — the catalog
+    // layer absorbs the transform.
+    TableMetadata responseMetadata =
+        maybeRewriteForOci(tableMetadata, resolvedStoragePath);
+    LoadTableResponse.Builder responseBuilder =
+        LoadTableResponse.builder().withTableMetadata(responseMetadata);
 
     if (resolvedStoragePath == null) {
       LOGGER.debug(
@@ -965,6 +977,36 @@ public abstract class IcebergCatalogHandler extends CatalogHandler implements Au
     }
 
     return responseBuilder;
+  }
+
+  /**
+   * If the resolved storage configuration for this table is OCI Object Storage, returns a
+   * {@link TableMetadata} with all {@code s3://} URIs rewritten to native OCI URLs.
+   * Otherwise returns {@code metadata} unchanged.
+   */
+  private TableMetadata maybeRewriteForOci(
+      TableMetadata metadata, @Nullable PolarisResolvedPathWrapper resolvedStoragePath) {
+    if (resolvedStoragePath == null) {
+      return metadata;
+    }
+    OciStorageConfigurationInfo oci =
+        org.apache.polaris.service.catalog.io.FileIOUtil.findStorageInfoFromHierarchy(
+                resolvedStoragePath)
+            .map(
+                e ->
+                    e.getInternalPropertiesAsMap()
+                        .get(
+                            org.apache.polaris.core.entity.PolarisEntityConstants
+                                .getStorageConfigInfoPropertyName()))
+            .map(PolarisStorageConfigurationInfo::deserialize)
+            .filter(info -> info instanceof OciStorageConfigurationInfo)
+            .map(info -> (OciStorageConfigurationInfo) info)
+            .orElse(null);
+    if (oci == null) {
+      return metadata;
+    }
+    OciUriRewriter uriRewriter = new OciUriRewriter(oci.getNamespace(), oci.getRegion());
+    return new TableMetadataRewriter(uriRewriter).rewrite(metadata);
   }
 
   private void validateRemoteTableLocations(

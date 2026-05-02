@@ -1086,7 +1086,8 @@ components:
             - GCS
             - AZURE
             - FILE
-          description: The cloud provider type this storage is built on. FILE is supported for testing purposes only
+            - OCI_OBJECT_STORE
+          description: The cloud provider type this storage is built on. FILE is supported for testing purposes only. OCI_OBJECT_STORE is OCI Object Storage with native-URL rewriting on the read path.
         allowedLocations:
           type: array
           items:
@@ -1104,6 +1105,7 @@ components:
           AZURE: "#/components/schemas/AzureStorageConfigInfo"
           GCS: "#/components/schemas/GcpStorageConfigInfo"
           FILE: "#/components/schemas/FileStorageConfigInfo"
+          OCI_OBJECT_STORE: "#/components/schemas/OciObjectStoreStorageConfigInfo"
 
     AwsStorageConfigInfo:
       type: object
@@ -1216,6 +1218,37 @@ components:
       description: file storage configuration info
       allOf:
         - $ref: '#/components/schemas/StorageConfigInfo'
+
+    OciObjectStoreStorageConfigInfo:
+      type: object
+      description: |
+        OCI Object Storage configuration. Writers (PyIceberg, Spark, etc.) use the
+        S3-compatible vhcompat endpoint with HMAC Customer Secret Keys, so allowed
+        locations are still s3://bucket/prefix style. The catalog rewrites s3:// URIs
+        in iceberg-REST LoadTable responses to native OCI URLs of the form
+        https://objectstorage.<region>.oraclecloud.com/n/<namespace>/b/<bucket>/o/<key>
+        so non-S3-compat readers (like ADW's iceberg engine) get URLs they can fetch.
+      allOf:
+        - $ref: '#/components/schemas/StorageConfigInfo'
+        - type: object
+          required:
+            - namespace
+            - region
+          properties:
+            namespace:
+              type: string
+              description: OCI tenancy namespace (used to construct native URLs).
+              example: "axydmvgg0v5v"
+            region:
+              type: string
+              description: OCI region (used to construct native URLs).
+              example: "us-sanjose-1"
+            s3CompatEndpoint:
+              type: string
+              description: |
+                Optional S3-compat endpoint Polaris uses for any server-side reads/writes
+                (typically vhcompat). Distinct from the native URLs the catalog emits to readers.
+              example: "https://vhcompat.objectstorage.us-sanjose-1.oci.customer-oci.com"
 
     ServiceIdentityInfo:
       type: object

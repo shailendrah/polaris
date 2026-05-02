@@ -155,6 +155,37 @@ public class PolarisStorageIntegrationProviderImpl implements PolarisStorageInte
               }
             };
         break;
+      case OCI_OBJECT_STORE:
+        // OCI Object Storage uses S3-compat for writes (clients bring their own
+        // OCI Customer Secret Keys via the catalog credential we don't vend).
+        // The catalog's job is to rewrite stored s3:// URIs to native OCI URLs
+        // on the read path; that happens in IcebergCatalogHandler, not here.
+        // No credential vending — clients bring their own auth.
+        storageIntegration =
+            new PolarisStorageIntegration<>((T) polarisStorageConfigurationInfo, "oci") {
+              @Override
+              public StorageAccessConfig getSubscopedCreds(
+                  @Nonnull RealmConfig realmConfig,
+                  boolean allowListOperation,
+                  @Nonnull Set<String> allowedReadLocations,
+                  @Nonnull Set<String> allowedWriteLocations,
+                  @Nonnull PolarisPrincipal polarisPrincipal,
+                  Optional<String> refreshCredentialsEndpoint,
+                  @Nonnull CredentialVendingContext credentialVendingContext) {
+                return StorageAccessConfig.builder().supportsCredentialVending(false).build();
+              }
+
+              @Override
+              public @Nonnull Map<String, Map<PolarisStorageActions, ValidationResult>>
+                  validateAccessToLocations(
+                      @Nonnull RealmConfig realmConfig,
+                      @Nonnull T storageConfig,
+                      @Nonnull Set<PolarisStorageActions> actions,
+                      @Nonnull Set<String> locations) {
+                return Map.of();
+              }
+            };
+        break;
       default:
         throw new IllegalArgumentException(
             "Unknown storage type " + polarisStorageConfigurationInfo.getStorageType());

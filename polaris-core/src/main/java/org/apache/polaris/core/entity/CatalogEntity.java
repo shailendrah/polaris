@@ -200,6 +200,17 @@ public class CatalogEntity extends PolarisEntity implements LocationBasedEntity 
             .setStorageName(fileConfigModel.getStorageName())
             .build();
       }
+      if (configInfo
+          instanceof org.apache.polaris.core.storage.oci.OciStorageConfigurationInfo ociConfig) {
+        return org.apache.polaris.core.admin.model.OciObjectStoreStorageConfigInfo.builder()
+            .setStorageType(StorageConfigInfo.StorageTypeEnum.OCI_OBJECT_STORE)
+            .setAllowedLocations(ociConfig.getAllowedLocations())
+            .setStorageName(ociConfig.getStorageName())
+            .setNamespace(ociConfig.getNamespace())
+            .setRegion(ociConfig.getRegion())
+            .setS3CompatEndpoint(ociConfig.getS3CompatEndpoint())
+            .build();
+      }
       return null;
     }
     return null;
@@ -354,6 +365,19 @@ public class CatalogEntity extends PolarisEntity implements LocationBasedEntity 
                 FileStorageConfigurationInfo.builder()
                     .allowedLocations(allowedLocations)
                     .storageName(storageConfigModel.getStorageName())
+                    .build();
+            break;
+          case OCI_OBJECT_STORE:
+            org.apache.polaris.core.admin.model.OciObjectStoreStorageConfigInfo ociModel =
+                (org.apache.polaris.core.admin.model.OciObjectStoreStorageConfigInfo)
+                    storageConfigModel;
+            config =
+                org.apache.polaris.core.storage.oci.OciStorageConfigurationInfo.builder()
+                    .allowedLocations(allowedLocations)
+                    .storageName(storageConfigModel.getStorageName())
+                    .namespace(ociModel.getNamespace())
+                    .region(ociModel.getRegion())
+                    .s3CompatEndpoint(ociModel.getS3CompatEndpoint())
                     .build();
             break;
           default:
