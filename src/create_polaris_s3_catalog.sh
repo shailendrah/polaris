@@ -56,12 +56,11 @@ curl -fsS -X POST "${POLARIS_HTTP}/api/management/v1/catalogs" \
       "s3.path-style-access": "false"
     },
     "storageConfigInfo": {
-      "storageType": "S3",
+      "storageType": "OCI_OBJECT_STORE",
       "allowedLocations": ["${WAREHOUSE}"],
-      "roleArn": "${ROLE_ARN}",
+      "namespace": "${OCI_NAMESPACE}",
       "region": "${OCI_REGION}",
-      "endpoint": "${S3_ENDPOINT}",
-      "stsEnabled": false
+      "s3CompatEndpoint": "${S3_ENDPOINT}"
     }
   }
 }
