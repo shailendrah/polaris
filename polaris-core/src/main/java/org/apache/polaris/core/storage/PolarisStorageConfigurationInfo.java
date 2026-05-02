@@ -43,6 +43,7 @@ import org.apache.polaris.core.entity.PolarisEntityConstants;
 import org.apache.polaris.core.storage.aws.AwsStorageConfigurationInfo;
 import org.apache.polaris.core.storage.azure.AzureStorageConfigurationInfo;
 import org.apache.polaris.core.storage.gcp.GcpStorageConfigurationInfo;
+import org.apache.polaris.core.storage.oci.OciStorageConfigurationInfo;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,7 @@ import org.slf4j.LoggerFactory;
   @JsonSubTypes.Type(value = AzureStorageConfigurationInfo.class),
   @JsonSubTypes.Type(value = GcpStorageConfigurationInfo.class),
   @JsonSubTypes.Type(value = FileStorageConfigurationInfo.class),
+  @JsonSubTypes.Type(value = OciStorageConfigurationInfo.class),
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class PolarisStorageConfigurationInfo {
@@ -200,6 +202,10 @@ public abstract class PolarisStorageConfigurationInfo {
     AZURE(List.of("abfs://", "wasb://", "abfss://", "wasbs://")),
     GCS("gs://"),
     FILE("file://"),
+    // Writers use S3-compat (s3:// URIs) against OCI's vhcompat endpoint;
+    // Polaris's iceberg-REST response handler rewrites these into OCI native
+    // URLs on the read path.
+    OCI_OBJECT_STORE(List.of("s3://", "s3a://")),
     ;
 
     private final List<String> prefixes;
