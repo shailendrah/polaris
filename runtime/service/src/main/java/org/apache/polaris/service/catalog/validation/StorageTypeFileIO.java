@@ -32,6 +32,12 @@ enum StorageTypeFileIO {
 
   FILE("org.apache.iceberg.hadoop.HadoopFileIO", false),
 
+  // OCI Object Storage uses S3-compat (vhcompat) for the bytes; FileIO impl
+  // is the same as S3 because writers and Polaris itself sign HMAC against
+  // the S3-compat endpoint. The catalog-level URI rewriter (LoadTable hook
+  // + OciManifestRewriter) is what makes readers see OCI native URLs.
+  OCI_OBJECT_STORE("org.apache.iceberg.aws.s3.S3FileIO", true),
+
   // Iceberg tests
   IN_MEMORY("org.apache.iceberg.inmemory.InMemoryFileIO", false, false),
   ;
@@ -79,7 +85,10 @@ enum StorageTypeFileIO {
         // Ensure that the storage type in this enum has a corresponding value
         PolarisStorageConfigurationInfo.StorageType.valueOf(value.name());
       }
-      map.put(value.fileIoImplementation, value);
+      // putIfAbsent so multiple StorageTypeFileIO values can share an
+      // underlying FileIO impl (e.g. S3 and OCI_OBJECT_STORE both use
+      // S3FileIO under the hood) without colliding in the reverse map.
+      map.putIfAbsent(value.fileIoImplementation, value);
     }
     FILE_TO_TO_STORAGE_TYPE = Collections.unmodifiableMap(map);
   }

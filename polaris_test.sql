@@ -1,5 +1,16 @@
 -- ----------------------------------------------------------------------------
--- polaris_test.sql
+-- polaris_test.sql — direct-file path (AWS S3 only on this branch)
+--
+-- Provisions the LAKEHOUSE user and registers the three Iceberg tables as
+-- Oracle external tables by passing each metadata.json URL directly to
+-- DBMS_CLOUD.CREATE_EXTERNAL_TABLE.
+--
+-- IMPORTANT: This script targets the AWS S3 demo. The `oos` branch's OCI
+-- demo uses polaris_test_mount.sql (DBMS_CATALOG.MOUNT_ICEBERG via Polaris)
+-- which works end-to-end against rewritten avros. The direct-file path
+-- doesn't yet work for OCI because the commit hook rewrites avros only —
+-- not the on-disk metadata.json. When that lands, this script will need an
+-- OCI variant pointing at <orig>.oci.metadata.json siblings.
 --
 -- Provisions the LAKEHOUSE user and registers the three Iceberg tables in
 -- s3://skmawsbucket1/polaris-iceberg/ as Oracle external tables. After this,

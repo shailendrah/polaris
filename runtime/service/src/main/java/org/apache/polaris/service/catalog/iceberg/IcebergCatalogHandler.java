@@ -901,7 +901,8 @@ public abstract class IcebergCatalogHandler extends CatalogHandler implements Au
                   tableMetadata,
                   resolvedMode,
                   actionsRequested,
-                  refreshCredentialsEndpoint)
+                  refreshCredentialsEndpoint,
+                  /* applyOciReadRewrite= */ true)
               .build();
       return Optional.of(filterResponseToSnapshots(response, snapshots));
     } else if (table instanceof BaseMetadataTable) {
@@ -919,16 +920,29 @@ public abstract class IcebergCatalogHandler extends CatalogHandler implements Au
       Optional<AccessDelegationMode> delegationMode,
       Set<PolarisStorageActions> actions,
       Optional<String> refreshCredentialsEndpoint) {
+    return buildLoadTableResponseWithDelegationCredentials(
+        tableIdentifier, tableMetadata, delegationMode, actions, refreshCredentialsEndpoint, false);
+  }
+
+  private LoadTableResponse.Builder buildLoadTableResponseWithDelegationCredentials(
+      TableIdentifier tableIdentifier,
+      TableMetadata tableMetadata,
+      Optional<AccessDelegationMode> delegationMode,
+      Set<PolarisStorageActions> actions,
+      Optional<String> refreshCredentialsEndpoint,
+      boolean applyOciReadRewrite) {
     PolarisResolvedPathWrapper resolvedStoragePath =
         CatalogUtils.findResolvedStorageEntity(resolutionManifest, tableIdentifier);
 
-    // For OCI Object Storage catalogs, rewrite s3:// URIs in the table metadata
-    // to native OCI URLs before serving the LoadTable response. Readers like
-    // ADW's iceberg engine that don't honor s3.endpoint overrides need URLs
-    // they can fetch directly. Writers continue using s3:// — the catalog
-    // layer absorbs the transform.
+    // For OCI Object Storage catalogs on the READ path only: rewrite s3:// URIs
+    // in the table metadata to native OCI URLs. Readers like ADW's iceberg
+    // engine need URLs they can fetch directly. We must NOT do this on the
+    // write path (createTable / updateTable responses) — writers like
+    // PyIceberg's S3FileIO can't handle https:// URIs and would fail.
     TableMetadata responseMetadata =
-        maybeRewriteForOci(tableMetadata, resolvedStoragePath);
+        applyOciReadRewrite
+            ? maybeRewriteForOci(tableMetadata, resolvedStoragePath)
+            : tableMetadata;
     LoadTableResponse.Builder responseBuilder =
         LoadTableResponse.builder().withTableMetadata(responseMetadata);
 
@@ -1001,10 +1015,16 @@ public abstract class IcebergCatalogHandler extends CatalogHandler implements Au
     }
     try {
       OciUriRewriter uriRewriter = new OciUriRewriter(oci.getNamespace(), oci.getRegion());
-      // Reuse the base catalog's FileIO — same credentials and S3-compat
-      // endpoint Polaris already uses for the table's own write path.
-      org.apache.iceberg.io.FileIO io =
-          ((org.apache.iceberg.BaseTable) baseCatalog.loadTable(tableIdentifier)).operations().io();
+      // Construct an S3FileIO targeting OCI's S3-compat endpoint with the
+      // server's AWS_* env vars (already set to OCI Customer Secret Keys
+      // in docker-compose). Iceberg's S3FileIO honors these properties and
+      // initializes its own SDK client from them.
+      org.apache.iceberg.aws.s3.S3FileIO io = new org.apache.iceberg.aws.s3.S3FileIO();
+      java.util.Map<String, String> props = new java.util.HashMap<>();
+      props.put("s3.endpoint", oci.getS3CompatEndpoint());
+      props.put("s3.region", oci.getRegion());
+      props.put("s3.path-style-access", "false");
+      io.initialize(props);
       OciManifestRewriter rewriter = new OciManifestRewriter(uriRewriter, io);
       RewrittenPaths paths = rewriter.rewriteAll(committed);
       LOGGER

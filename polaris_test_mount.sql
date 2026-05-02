@@ -1,22 +1,38 @@
 -- ----------------------------------------------------------------------------
--- polaris_test_mount.sql
+-- polaris_test_mount.sql — OCI Object Storage demo (mount path)
 --
--- OCI-Object-Storage variant. Uses DBMS_CATALOG.MOUNT_ICEBERG so ADW talks
--- to Polaris's iceberg-REST endpoint (over an ngrok tunnel from the laptop)
--- to resolve table → metadata-location, then fetches the actual data files
--- from OCI Object Storage directly via the vhcompat S3-compat URL.
+-- Uses DBMS_CATALOG.MOUNT_ICEBERG so ADW talks to Polaris (via ngrok) for
+-- the catalog state and fetches the rewritten avros + parquet directly
+-- from OCI Object Storage's NATIVE URL form.
 --
--- Run:
+-- Architecture (works because of the polaris-extensions-storage-oci hook):
+--   ADW ── REST via ngrok ──▶ Polaris       (catalog state, returns
+--                                            metadata.json with native OCI URLs)
+--   ADW ── HTTPS direct  ──▶ OCI Object     (.oci.avro siblings + parquet
+--                              Storage      via objectstorage.<region>.
+--                                            oraclecloud.com/n/<ns>/b/...)
+--
+-- Run (eight positional args):
 --   sql /nolog @polaris_test_mount.sql \
---     "$OCI_ACCESS_KEY"            \  # &1 — Customer Secret Key access ID
---     "$OCI_SECRET_ACCESS_KEY"     \  # &2 — Customer Secret Key secret
---     "$ADW_ADMIN_PWD"             \  # &3
---     "$ADW_CONNECT_ALIAS"         \  # &4
---     "<ngrok-host>"               \  # &5 — e.g. overstate-setback-going.ngrok-free.dev
+--     "$ADW_ADMIN_PWD"          \  # &1
+--     "$ADW_CONNECT_ALIAS"      \  # &2
+--     "<ngrok-host>"            \  # &3
+--     "$TOKEN"                  \  # &4 — Polaris OAuth access_token (curl)
+--     "$OCI_USER_OCID"          \  # &5
+--     "$OCI_TENANCY_OCID"       \  # &6
+--     "$OCI_FINGERPRINT"        \  # &7
+--     "$OCI_PRIVATE_KEY_BODY"   \  # &8 — single-line base64 (no headers)
 --
--- Refresh the ngrok host argument every time you restart `ngrok http 8181`
--- (free tier rotates the subdomain).
---
+-- Helper one-liner to harvest OCI native auth from ~/.oci before invoking:
+--   USER_OCID=$(awk -F= '/^user=/{print $2}' ~/.oci/config)
+--   TENANCY=$(awk -F= '/^tenancy=/{print $2}' ~/.oci/config)
+--   FP=$(awk -F= '/^fingerprint=/{print $2}' ~/.oci/config)
+--   PEM=$(awk '/-----BEGIN/{f=1;next}/-----END/{f=0}f' ~/.oci/oci_api_key.pem | tr -d '\n')
+--   TOKEN=$(curl -fsS https://<ngrok>/api/catalog/v1/oauth/tokens \
+--     --user root:s3cr3t -d 'grant_type=client_credentials' \
+--     -d 'scope=PRINCIPAL_ROLE:ALL' | jq -r .access_token)
+--   sql /nolog @polaris_test_mount.sql "$ADW_ADMIN_PWD" "$ADW_CONNECT_ALIAS" \
+--     "<ngrok>" "$TOKEN" "$USER_OCID" "$TENANCY" "$FP" "$PEM"
 -- ----------------------------------------------------------------------------
 
 SET ECHO ON
@@ -26,26 +42,24 @@ SET DEFINE ON
 SET VERIFY OFF
 WHENEVER SQLERROR EXIT FAILURE ROLLBACK
 
-DEFINE oci_key       = '&1'
-DEFINE oci_secret    = '&2'
-DEFINE dba_password  = '&3'
-DEFINE db_alias      = '&4'
-DEFINE ngrok_host    = '&5'
+DEFINE dba_password    = '&1'
+DEFINE db_alias        = '&2'
+DEFINE ngrok_host      = '&3'
+DEFINE polaris_token   = '&4'
+DEFINE oci_user_ocid   = '&5'
+DEFINE oci_tenancy     = '&6'
+DEFINE oci_fingerprint = '&7'
+DEFINE oci_private_key = '&8'
 
-DEFINE dba_user           = 'admin'
-DEFINE polaris_client_id  = 'root'
-DEFINE polaris_secret     = 's3cr3t'
-DEFINE polaris_catalog    = 's3_catalog'
-DEFINE iceberg_namespace  = 'demo'
-DEFINE adw_catalog        = 'POLARIS_OCI'
+DEFINE dba_user          = 'admin'
+DEFINE polaris_catalog   = 's3_catalog'
+DEFINE iceberg_namespace = 'demo'
+DEFINE adw_catalog       = 'POLARIS_OCI'
+DEFINE lakehouse_pwd     = 'Lh0use#2026Demo'
 
--- OCI Object Storage host that holds the actual data files. Polaris vends
--- s3:// URIs which ADW resolves against the s3.endpoint Polaris also returns
--- in the iceberg-REST loadTable response (vhcompat host with bucket subdomain).
-DEFINE oci_storage_host = 'polaris-iceberg.vhcompat.objectstorage.us-sanjose-1.oci.customer-oci.com'
-
--- LAKEHOUSE password (mandatory profile rules — see polaris_test.sql comments).
-DEFINE lakehouse_pwd = 'Lh0use#2026Demo'
+-- The host ADW reads data files from. Native OCI Object Storage URL form;
+-- Polaris's OCI hook rewrites s3:// URIs in metadata + avros to point here.
+DEFINE oci_storage_host  = 'objectstorage.us-sanjose-1.oraclecloud.com'
 
 -- ============================================================================
 -- A. As ADMIN: provision LAKEHOUSE, grant DWROLE, ACL the two egress hosts.
@@ -66,8 +80,8 @@ END;
 GRANT CREATE SESSION, CREATE TABLE, UNLIMITED TABLESPACE TO lakehouse;
 GRANT DWROLE TO lakehouse;
 
--- Egress to Polaris via ngrok (catalog REST calls) and OCI Object Storage
--- (data file fetches). APPEND_HOST_ACE is idempotent.
+-- Egress to Polaris via ngrok (catalog REST) and to OCI native objectstorage
+-- (data + avro fetches). APPEND_HOST_ACE is idempotent.
 BEGIN
   DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE(
     host       => '&ngrok_host',
@@ -88,14 +102,14 @@ END;
 /
 
 -- ============================================================================
--- B. As LAKEHOUSE: create the two credentials and mount Polaris.
+-- B. As LAKEHOUSE: create credentials and mount Polaris.
 -- ============================================================================
 PROMPT
 PROMPT === B. LAKEHOUSE: credentials and MOUNT_ICEBERG ===
 CONNECT lakehouse/&lakehouse_pwd@&db_alias
 
--- Polaris REST OAuth2 client credentials. Polaris's /v1/oauth/tokens endpoint
--- expects them as the username/password of basic-auth → we pass them through.
+-- Polaris OAuth bearer token. MOUNT_ICEBERG sends this literally as
+-- `Authorization: Bearer <password>`; Polaris validates the JWT.
 BEGIN
   DBMS_CLOUD.DROP_CREDENTIAL(credential_name => 'POLARIS_REST_CRED');
 EXCEPTION WHEN OTHERS THEN
@@ -105,13 +119,15 @@ END;
 BEGIN
   DBMS_CLOUD.CREATE_CREDENTIAL(
     credential_name => 'POLARIS_REST_CRED',
-    username        => '&polaris_client_id',
-    password        => '&polaris_secret');
+    username        => 'token',
+    password        => '&polaris_token');
 END;
 /
 
--- OCI Object Storage credentials (Customer Secret Keys), used by ADW for
--- HTTPS GETs to the vhcompat host that Polaris's catalog config advertises.
+-- OCI Object Storage credential — native API-key auth (NOT Customer Secret
+-- Keys / HMAC). Required because the URLs ADW now follows are native form
+-- (https://objectstorage.<region>.oraclecloud.com/n/...) which uses OCI
+-- request-signing, not S3 SigV4.
 BEGIN
   DBMS_CLOUD.DROP_CREDENTIAL(credential_name => 'OCI_STORAGE_CRED');
 EXCEPTION WHEN OTHERS THEN
@@ -121,48 +137,61 @@ END;
 BEGIN
   DBMS_CLOUD.CREATE_CREDENTIAL(
     credential_name => 'OCI_STORAGE_CRED',
-    username        => '&oci_key',
-    password        => '&oci_secret');
+    user_ocid       => '&oci_user_ocid',
+    tenancy_ocid    => '&oci_tenancy',
+    private_key     => '&oci_private_key',
+    fingerprint     => '&oci_fingerprint');
 END;
 /
 
--- Unmount any prior version of POLARIS_OCI catalog so this re-runs cleanly.
-BEGIN
-  DBMS_CATALOG.UNMOUNT(catalog_name => '&adw_catalog');
-EXCEPTION WHEN OTHERS THEN NULL;  -- ignore "not mounted"
+-- Unmount any prior version so this re-runs cleanly.
+BEGIN DBMS_CATALOG.UNMOUNT(catalog_name => '&adw_catalog');
+EXCEPTION WHEN OTHERS THEN NULL;
 END;
 /
 
 PROMPT >>> Mounting Polaris as iceberg-REST catalog
+DECLARE
+  cfg SYS.JSON_OBJECT_T := SYS.JSON_OBJECT_T();
 BEGIN
+  cfg.put('isPublicCatalog', FALSE);
+
   DBMS_CATALOG.MOUNT_ICEBERG(
     catalog_name            => '&adw_catalog',
-    -- Polaris is a multi-warehouse REST catalog. Per ngrok logs, ADW
-    -- doesn't perform the iceberg-REST /v1/config handshake to learn the
-    -- prefix; it just appends /namespaces directly. So the endpoint must
-    -- already include /v1/<warehouse>.
     endpoint                => 'https://&ngrok_host/api/catalog/v1/&polaris_catalog',
-    catalog_credential       => 'POLARIS_REST_CRED',
+    catalog_credential      => 'POLARIS_REST_CRED',
     data_storage_credential => 'OCI_STORAGE_CRED',
+    configuration           => cfg,
     catalog_type            => 'ICEBERG_POLARIS');
 END;
 /
 
 -- ============================================================================
--- C. Materialise the catalog's tables as ADW views.
---    CREATE_SYNCHRONIZED_VIEWS reads the iceberg-REST catalog and creates a
---    view in the current schema for every table in the namespace. View names
---    default to the iceberg table names (users, orders, products) — we add a
---    DEMO_ prefix for clarity.
+-- C. Trigger a fetch and create views over the catalog tables.
 -- ============================================================================
-PROMPT >>> CREATE_SYNCHRONIZED_VIEWS for namespace &iceberg_namespace
+PROMPT
+PROMPT === C. Populate cache and create views ===
+
+BEGIN DBMS_CATALOG.FLUSH_CATALOG_CACHE('&adw_catalog'); END;
+/
+
+PROMPT >>> Catalog metadata as ADW sees it (forces a fetch)
+SELECT * FROM TABLE(DBMS_CATALOG.GET_SCHEMAS(catalog_name => '&adw_catalog'));
+SELECT * FROM TABLE(DBMS_CATALOG.GET_TABLES(catalog_name => '&adw_catalog'));
+
+PROMPT >>> Materializing demo_users / demo_orders / demo_products as views
+DECLARE
+  v_sql CLOB;
 BEGIN
-  DBMS_CATALOG.CREATE_SYNCHRONIZED_VIEWS(
-    catalog_name     => '&adw_catalog',
-    schema_name      => '&iceberg_namespace',
-    view_prefix      => 'DEMO_',
-    replace_existing => TRUE,
-    ignore_errors    => FALSE);
+  FOR r IN (SELECT 'users'   AS iceberg_name, 'demo_users'    AS view_name FROM dual UNION ALL
+            SELECT 'orders',                  'demo_orders'              FROM dual UNION ALL
+            SELECT 'products',                'demo_products'            FROM dual) LOOP
+    v_sql := DBMS_CATALOG.GENERATE_TABLE_SELECT(
+               catalog_name => '&adw_catalog',
+               schema_name  => '"&iceberg_namespace"',
+               table_name   => '"' || r.iceberg_name || '"');
+    EXECUTE IMMEDIATE 'CREATE OR REPLACE VIEW ' || r.view_name || ' AS ' || v_sql;
+  END LOOP;
 END;
 /
 
@@ -189,7 +218,8 @@ SELECT category, COUNT(*) AS n, ROUND(AVG(price), 2) AS avg_price
   FROM demo_products GROUP BY category ORDER BY n DESC;
 
 PROMPT
-PROMPT === Done. Catalog refreshes from Polaris on every query — ===
-PROMPT === re-running PyIceberg writers does NOT require re-mounting. ===
+PROMPT === Done. After each PyIceberg run, just FLUSH the catalog cache: ===
+PROMPT   EXEC DBMS_CATALOG.FLUSH_CATALOG_CACHE('&adw_catalog');
+PROMPT === The Polaris OCI hook handles avro rewriting; the views auto-refresh ===
 
 EXIT;

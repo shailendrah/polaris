@@ -6,7 +6,17 @@
 #   2. Pretty-print full Iceberg metadata for one table
 #   3. Show namespace metadata
 #   4. Print DEFINE <name>_meta = '<https-metadata-url>' lines ready to paste
-#      into test_polaris.sql
+#      into polaris_test.sql
+#
+# Companion to polaris_test.sql (the direct-file path).
+#
+# NOTE: This script and polaris_test.sql currently target the AWS S3 / vhcompat
+# direct-file path. For the OCI Object Storage demo on this branch, use
+# polaris_test_mount.sql instead — it uses DBMS_CATALOG.MOUNT_ICEBERG so ADW
+# reads the rewritten avros (.oci.avro siblings produced by Polaris's OCI
+# hook) via OCI native URLs. To make this script work for OCI we'd also need
+# the commit hook to write a rewritten metadata.json sibling on disk, which
+# isn't done yet.
 #
 # Prereq: server is up (`make polaris-up`) with the s3_catalog created and
 # tables written via `python src/generate_iceberg_tables.py`.
