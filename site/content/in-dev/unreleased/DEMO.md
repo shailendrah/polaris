@@ -215,9 +215,68 @@ SQL> SELECT u.name, COUNT(o.id) AS order_count, ROUND(SUM(o.amount), 2) AS total
 
 ---
 
+## 9. Auto-refresh via `DBMS_CATALOG.MOUNT_ICEBERG` (ngrok)
+
+Section 7's external tables are **pinned** to a specific `metadata.json`, so
+every PyIceberg run forces a copy/paste of new `DEFINE` lines and a re-run of
+the SQL script. The newer path uses `DBMS_CATALOG.MOUNT_ICEBERG` to mount
+Polaris as an iceberg-REST catalog — ADW asks Polaris for the *current*
+`metadata-location` on every query, so refreshes only require a cache flush.
+
+The wrinkle: Polaris is on your laptop, ADW is in OCI. Expose Polaris with
+[ngrok](https://ngrok.com):
+
+```
+ngrok http 8181
+# copy the https forwarding host, e.g. overstate-setback-going.ngrok-free.dev
+export NGROK_HOST=overstate-setback-going.ngrok-free.dev   # host only, no scheme
+```
+
+Then run:
+
+```
+./polaris_test_mount.sh
+```
+
+Which:
+
+- Calls `POST https://${NGROK_HOST}/api/catalog/v1/oauth/tokens` with
+  `root:s3cr3t` to get an OAuth2 JWT (valid ~1 hour).
+- Pipes the args through `sql /nolog` via stdin (the SQLcl CLI parser
+  chokes on JWTs that start with `-` from URL-safe base64).
+- Runs `polaris_test_mount.sql` which:
+  - **A.** As ADMIN: ensures `LAKEHOUSE`, grants `DWROLE`, and
+    `APPEND_HOST_ACE` for **both** `${NGROK_HOST}` (catalog REST) and
+    `<bucket>.s3.<region>.amazonaws.com` (data files).
+  - **B.** As LAKEHOUSE: drops/creates `POLARIS_REST_CRED` with the JWT as
+    the password (`MOUNT_ICEBERG` sends `Authorization: Bearer <password>`
+    literally — no OAuth handshake), creates `AWS_S3_CRED`, then
+    `UNMOUNT` + `MOUNT_ICEBERG` against
+    `https://${NGROK_HOST}/api/catalog/v1/s3_catalog` with
+    `catalog_type=ICEBERG_POLARIS` and `bucketRegion=us-west-1`.
+  - **C.** `FLUSH_CATALOG_CACHE`, lists schemas/tables, then for each of
+    `users/orders/products` runs `DBMS_CATALOG.GENERATE_TABLE_SELECT` and
+    wraps the result in `CREATE OR REPLACE VIEW demo_<t>`.
+    (`CREATE_SYNCHRONIZED_VIEWS` is a silent no-op on this ADW build.)
+  - **D.** Smoke tests: row counts, sample users, order-status breakdown,
+    avg price by category.
+
+After mount, refreshing data is one line:
+
+```
+sql lakehouse/'Lh0use#2026Demo'@$ADW_CONNECT_ALIAS <<< \
+  "EXEC DBMS_CATALOG.FLUSH_CATALOG_CACHE('POLARIS_S3');"
+```
+
+The next `SELECT` against `demo_users / demo_orders / demo_products` sees the
+new snapshot. When ADW starts returning 401s from the mount (token TTL ~1h),
+re-run `./polaris_test_mount.sh` to fetch a fresh JWT and re-mount.
+
+---
+
 ## Re-running after a data refresh
 
-When you re-run `python src/generate_iceberg_tables.py`:
+**Pinned path (Section 7):**
 
 1. New parquet files land in S3.
 2. Polaris commits a new snapshot → `metadata-location` advances.
@@ -225,6 +284,9 @@ When you re-run `python src/generate_iceberg_tables.py`:
    pins, doesn't auto-refresh).
 4. Re-run `./polaris_test.sh`, copy the new `DEFINE` lines into
    `polaris_test.sql`, then re-run section C of the SQL script.
+
+**Mount path (Section 9):** just `EXEC DBMS_CATALOG.FLUSH_CATALOG_CACHE('POLARIS_S3');`
+— Polaris vends the fresh `metadata-location`, no script edits.
 
 ---
 
